@@ -1,3 +1,3 @@
-module github.com/dmithamo/g-stats
+module github.com/dmithamo/todolist
 
 go 1.14

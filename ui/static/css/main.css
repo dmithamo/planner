@@ -1,0 +1,94 @@
+* {
+	font-family: "Indie Flower", cursive !important;
+}
+
+body,
+html {
+	margin: 0;
+	padding: 0;
+	background-color: rgb(245, 245, 245);
+	color: rgba(32, 32, 32, 0.856);
+	height: 100vh;
+}
+
+body {
+	display: grid;
+	grid-template-columns: 1fr 12fr;
+}
+a {
+	color: rgb(32, 32, 32, 0.856);
+}
+
+a:hover {
+	color: rgb(0, 0, 0);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+	margin: 0;
+}
+
+nav {
+	height: 100vh;
+	background-color: rgb(5, 76, 170);
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: flex-start;
+}
+
+nav > span {
+	padding: 0.5em;
+	display: flex;
+	flex-direction: column;
+}
+
+nav > span:first-of-type {
+	flex-grow: 1;
+}
+
+nav > span > a {
+	padding: 0 1em;
+	color: rgb(195, 195, 195);
+	text-decoration: none;
+	width: 100%;
+	font-weight: bold;
+}
+
+nav > span > a:hover,
+nav > span > a:active,
+nav > span > a.selected {
+	color: white;
+	text-decoration: double;
+}
+
+nav > span > a > span {
+	display: grid;
+	grid-template-columns: 1fr 4fr;
+}
+
+section {
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+}
+
+section > div {
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+footer {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}

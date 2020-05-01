@@ -1,0 +1,30 @@
+{{define "base"}}
+<html lang="eng">
+  <head>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap" rel="stylesheet">
+    <link rel="shortcut icon" href="/static/img/favicon.ico">
+    <title>{{template "title" .}} - TodoList</title>
+  </head>
+  <body>
+    <nav>
+      <span>
+        <a href="/">home</a>
+        <a href="/list/add">add</a>
+      </span>
+      <span>
+        <a href="/settings">settings</a>
+        <a href="/">logout</a>
+      </span>
+    </nav>
+    <section>
+      <div>
+        {{template "body" .}}
+      </div>
+
+      {{template "footer" .}}
+      <script src="/static/js/main.js"></script>
+    </section>
+  </body>
+</html>
+{{end}}
