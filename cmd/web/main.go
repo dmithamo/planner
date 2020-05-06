@@ -11,8 +11,13 @@ var infoLogger *log.Logger
 var errLogger *log.Logger
 
 func init() {
-	infoLogger = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime|log.Lshortfile)
-	errLogger = log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	f, err := os.OpenFile("./logs/logs.log", os.O_RDWR|os.O_CREATE, 0666)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	infoLogger = log.New(f, "INFO\t", log.Ldate|log.Ltime|log.Lshortfile)
+	errLogger = log.New(f, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 }
 
 func main() {
