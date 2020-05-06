@@ -7,17 +7,12 @@ import (
 	"strconv"
 )
 
-// insertErrMessage is a helper for inserting errors
-func insertErrMessage(err error) string {
-	return fmt.Sprintf(`{"msg":"something went wrong: %v"}`, err)
-}
-
-func home(w http.ResponseWriter, r *http.Request) {
-	infoLogger.Println(r.Method, r.URL)
+// home handles requests to /
+func (a *application) home(w http.ResponseWriter, r *http.Request) {
+	a.infoLogger.Println(r.Method, r.URL)
 
 	if r.URL.Path != "/" {
-		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte(`{"msg":"not found"}`))
+		a.handleError(w, r, fmt.Errorf("resource with URL %v not found", r.URL))
 		return
 	}
 
@@ -28,21 +23,20 @@ func home(w http.ResponseWriter, r *http.Request) {
 	}...)
 
 	if err != nil {
-		errLogger.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(insertErrMessage(err)))
+		a.errLogger.Println(err)
+		a.handleError(w, r, err)
 		return
 	}
 
 	if err := ts.Execute(w, nil); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(insertErrMessage(err)))
+		a.handleError(w, r, err)
 		return
 	}
 }
 
-func list(w http.ResponseWriter, r *http.Request) {
-	infoLogger.Println(r.Method, r.URL)
+// list handles requests to /list
+func (a *application) list(w http.ResponseWriter, r *http.Request) {
+	a.infoLogger.Println(r.Method, r.URL)
 
 	id := r.URL.Query().Get("id")
 
@@ -53,8 +47,7 @@ func list(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if _, err := strconv.Atoi(id); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(fmt.Sprintf(`{"msg": "invalid id: %v"}`, id)))
+		a.handleError(w, r, err)
 		return
 	}
 
@@ -65,20 +58,18 @@ func list(w http.ResponseWriter, r *http.Request) {
 	}...)
 
 	if err != nil {
-		errLogger.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(insertErrMessage(err)))
+		a.handleError(w, r, err)
 		return
 	}
 
 	if err := ts.Execute(w, id); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(insertErrMessage(err)))
+		a.handleError(w, r, err)
 	}
 }
 
-func add(w http.ResponseWriter, r *http.Request) {
-	infoLogger.Println(r.Method, r.URL)
+// ad handles requests to /list/add
+func (a *application) add(w http.ResponseWriter, r *http.Request) {
+	a.infoLogger.Println(r.Method, r.URL)
 
 	ts, err := template.ParseFiles([]string{
 		"./ui/html/add.page.tmpl",
@@ -87,21 +78,19 @@ func add(w http.ResponseWriter, r *http.Request) {
 	}...)
 
 	if err != nil {
-		errLogger.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(insertErrMessage(err)))
+		a.handleError(w, r, err)
 		return
 	}
 
 	if err := ts.Execute(w, nil); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(insertErrMessage(err)))
+		a.handleError(w, r, err)
 		return
 	}
 }
 
-func settings(w http.ResponseWriter, r *http.Request) {
-	infoLogger.Println(r.Method, r.URL)
+// settings handles requests to /settings
+func (a *application) settings(w http.ResponseWriter, r *http.Request) {
+	a.infoLogger.Println(r.Method, r.URL)
 
 	ts, err := template.ParseFiles([]string{
 		"./ui/html/settings.page.tmpl",
@@ -110,15 +99,12 @@ func settings(w http.ResponseWriter, r *http.Request) {
 	}...)
 
 	if err != nil {
-		errLogger.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(insertErrMessage(err)))
+		a.handleError(w, r, err)
 		return
 	}
 
 	if err := ts.Execute(w, nil); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(insertErrMessage(err)))
+		a.handleError(w, r, err)
 		return
 	}
 }
