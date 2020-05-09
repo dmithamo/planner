@@ -29,6 +29,8 @@ func (a *application) handleError(w http.ResponseWriter, r *http.Request, err er
 		w.Write([]byte(insertErrMessage(err)))
 		return
 	}
+
+	a.errLogger.Println(errTrace)
 }
 
 // insertErrMessage is a helper for inserting errors
