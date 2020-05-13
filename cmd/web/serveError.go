@@ -7,13 +7,13 @@ import (
 	"runtime/debug"
 )
 
-func (a *application) handleError(w http.ResponseWriter, r *http.Request, err error) {
+func (a *application) serveError(w http.ResponseWriter, r *http.Request, err error) {
 	errTrace := fmt.Sprintf("%v\n%v", err.Error(), string(debug.Stack()))
 
 	ts, err := template.ParseFiles([]string{
-		"./ui/html/error.page.tmpl",
-		"./ui/html/base.layout.tmpl",
-		"./ui/html/footer.partial.tmpl",
+		"./views/html/error.page.tmpl",
+		"./views/html/base.layout.tmpl",
+		"./views/html/footer.partial.tmpl",
 	}...)
 
 	if err != nil {

@@ -43,7 +43,7 @@ func init() {
 	logservice.AttachLogFile(f)
 	log.Printf("logging to file %v", logFile)
 
-	staticDir := "./ui/static"
+	staticDir := "./views/static"
 	staticResServer := http.FileServer(http.Dir(staticDir))
 
 	mux := http.NewServeMux()

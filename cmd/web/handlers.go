@@ -11,24 +11,24 @@ func (a *application) landingPage(w http.ResponseWriter, r *http.Request) {
 	a.infoLogger.Println(r.Method, r.URL)
 
 	if r.URL.Path != "/" {
-		a.handleError(w, r, fmt.Errorf("resource with URL %v not found", r.URL))
+		a.serveError(w, r, fmt.Errorf("resource with URL %v not found", r.URL))
 		return
 	}
 
 	ts, err := template.ParseFiles([]string{
-		"./ui/html/auth.page.tmpl",
-		"./ui/html/base.layout.tmpl",
-		"./ui/html/footer.partial.tmpl",
+		"./views/html/auth.page.tmpl",
+		"./views/html/base.layout.tmpl",
+		"./views/html/footer.partial.tmpl",
 	}...)
 
 	if err != nil {
 		a.errLogger.Println(err)
-		a.handleError(w, r, err)
+		a.serveError(w, r, err)
 		return
 	}
 
 	if err := ts.Execute(w, nil); err != nil {
-		a.handleError(w, r, err)
+		a.serveError(w, r, err)
 		return
 	}
 	a.infoLogger.Println(http.StatusOK)
@@ -39,18 +39,18 @@ func (a *application) listOfTodos(w http.ResponseWriter, r *http.Request) {
 	a.infoLogger.Println(r.Method, r.URL)
 
 	ts, err := template.ParseFiles([]string{
-		"./ui/html/home.page.tmpl",
-		"./ui/html/base.layout.tmpl",
-		"./ui/html/footer.partial.tmpl",
+		"./views/html/home.page.tmpl",
+		"./views/html/base.layout.tmpl",
+		"./views/html/footer.partial.tmpl",
 	}...)
 
 	if err != nil {
-		a.handleError(w, r, err)
+		a.serveError(w, r, err)
 		return
 	}
 
 	if err := ts.Execute(w, nil); err != nil {
-		a.handleError(w, r, err)
+		a.serveError(w, r, err)
 		return
 	}
 
@@ -62,18 +62,18 @@ func (a *application) settings(w http.ResponseWriter, r *http.Request) {
 	a.infoLogger.Println(r.Method, r.URL)
 
 	ts, err := template.ParseFiles([]string{
-		"./ui/html/settings.page.tmpl",
-		"./ui/html/base.layout.tmpl",
-		"./ui/html/footer.partial.tmpl",
+		"./views/html/settings.page.tmpl",
+		"./views/html/base.layout.tmpl",
+		"./views/html/footer.partial.tmpl",
 	}...)
 
 	if err != nil {
-		a.handleError(w, r, err)
+		a.serveError(w, r, err)
 		return
 	}
 
 	if err := ts.Execute(w, nil); err != nil {
-		a.handleError(w, r, err)
+		a.serveError(w, r, err)
 		return
 	}
 	a.infoLogger.Println(http.StatusOK)
