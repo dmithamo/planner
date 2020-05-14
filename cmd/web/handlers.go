@@ -34,8 +34,8 @@ func (a *application) landingPage(w http.ResponseWriter, r *http.Request) {
 	a.infoLogger.Println(http.StatusOK)
 }
 
-// ad handles requests to /list/listOfTodos
-func (a *application) listOfTodos(w http.ResponseWriter, r *http.Request) {
+// ad handles requests to /list/listOfProjects
+func (a *application) listOfProjects(w http.ResponseWriter, r *http.Request) {
 	a.infoLogger.Println(r.Method, r.URL)
 
 	ts, err := template.ParseFiles([]string{
@@ -54,6 +54,7 @@ func (a *application) listOfTodos(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	a.projects.Insert("I am the stone that the builder refused", "No description")
 	a.infoLogger.Println(http.StatusOK)
 }
 
