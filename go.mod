@@ -1,4 +1,4 @@
-module github.com/dmithamo/todolist
+module github.com/dmithamo/planner
 
 go 1.14
 

@@ -1,4 +1,4 @@
-package mysqlservice
+package mysql
 
 var schemas map[string]string
 
