@@ -8,8 +8,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/dmithamo/todolist/pkg/logservice"
-	dbservice "github.com/dmithamo/todolist/pkg/mysqlservice"
+	ilog "github.com/dmithamo/planner/pkg/log" // custom logger
+	"github.com/dmithamo/planner/pkg/mysql"
+	"github.com/dmithamo/planner/pkg/projects"
 )
 
 type data interface{}
@@ -19,7 +20,7 @@ type application struct {
 	port            *string
 	staticResServer http.Handler
 	mux             *http.ServeMux
-	projects        dbservice.Projects // data: projects
+	projects        *projects.Projects
 }
 
 // make this global to both init() and main() to keep main() short
@@ -31,33 +32,45 @@ func init() {
 	dsn := flag.String("db", "", "data source name of the db to be used")
 	flag.Parse()
 
+	// instantiate loggers
 	logFile := fmt.Sprintf("./logs/log_%v.log", time.Now())
 	f, err := os.OpenFile(logFile, os.O_RDWR|os.O_CREATE, 0666)
 	if err != nil {
 		log.Fatal(err)
 	}
-	logservice.AttachLogFile(f)
-	log.Printf("logging to file %v", logFile)
+	logservice := &ilog.Log{
+		LogFile: f,
+	}
+	logservice.AttachLogFile()
+
+	// instantiate db, and create tables.
+	// db errs are logged(even fatal errs) from the db service, but using main's loggers
+	dbservice := &mysql.Mysql{InfoLogger: logservice.InfoLogger, ErrorLogger: logservice.ErrorLogger}
+	db, _ := dbservice.OpenDB(*dsn)
+	dbservice.IDB = db
+	// defer db.Close() <- This is not necessary. Or is it? TODO
+	dbservice.DropTables()
+	dbservice.CreateTables()
+
+	// instantiate projects model
+	projects := projects.Projects{
+		IDB:         db,
+		InfoLogger:  logservice.InfoLogger,
+		ErrorLogger: logservice.ErrorLogger,
+	}
 
 	staticDir := "./views/static"
 	staticResServer := http.FileServer(http.Dir(staticDir))
 
 	mux := http.NewServeMux()
 
-	// instantiate db, and create tables.
-	// db errs are logged from the db service, but using main's loggers
-	db, _ := dbservice.OpenDB(*dsn, logservice.InforLogger, logservice.ErrorLogger)
-	// defer db.Close() <- This is not necessary. Or is it? TODO
-	dbservice.DropTables(db)
-	dbservice.CreateTables(db)
-
 	app = &application{
 		port:            port,
-		infoLogger:      logservice.InforLogger,
+		infoLogger:      logservice.InfoLogger,
 		errLogger:       logservice.ErrorLogger,
 		mux:             mux,
 		staticResServer: staticResServer,
-		projects:        dbservice.Projects{DB: db},
+		projects:        &projects,
 	}
 }
 
