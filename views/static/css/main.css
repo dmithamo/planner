@@ -68,6 +68,7 @@ nav > span > a {
 	text-decoration: none;
 	width: 100%;
 	font-weight: bold;
+	text-transform: capitalize;
 }
 
 nav > span > a:hover,

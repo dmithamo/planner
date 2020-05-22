@@ -18,11 +18,11 @@ type Projects struct {
 
 // Model represents the fields present in a project
 type Model struct {
-	ID          uuid.UUID
-	Title       string
-	Description string
-	Created     time.Time
-	Updated     time.Time
+	ID          uuid.UUID `json:"id"`
+	Title       string    `json:"title"`
+	Description string    `json:"description"`
+	Created     time.Time `json:"created"`
+	Updated     time.Time `json:"updated"`
 }
 
 // Insert creates a new project in the db

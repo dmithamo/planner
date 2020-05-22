@@ -43,9 +43,7 @@ func init() {
 	}
 	logservice.AttachLogFile()
 
-	// instantiate db, and create tables.
-	// db errs are logged(even fatal errs) from the db service, but using main's loggers
-	dbservice := &mysql.Mysql{InfoLogger: logservice.InfoLogger, ErrorLogger: logservice.ErrorLogger}
+	dbservice := &mysql.Mysql{}
 	db, _ := dbservice.OpenDB(*dsn)
 	dbservice.IDB = db
 	// defer db.Close() <- This is not necessary. Or is it? TODO
@@ -77,7 +75,9 @@ func init() {
 // main runs an instance of the app
 func main() {
 	app.mux.HandleFunc("/", app.landingPage)
-	app.mux.HandleFunc("/list/", app.listOfProjects)
+	app.mux.HandleFunc("/projects/", app.listOfProjects)
+	app.mux.HandleFunc("/projects/?id", app.singleProject)
+
 	app.mux.HandleFunc("/settings/", app.settings)
 	app.mux.Handle("/static/", http.StripPrefix("/static", app.staticResServer))
 

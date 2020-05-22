@@ -1,9 +1,12 @@
 package main
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"html/template"
 	"net/http"
+	"strings"
 )
 
 // landingPage handles requests to /
@@ -38,6 +41,7 @@ func (a *application) landingPage(w http.ResponseWriter, r *http.Request) {
 func (a *application) listOfProjects(w http.ResponseWriter, r *http.Request) {
 	a.infoLogger.Println(r.Method, r.URL)
 
+	projects, err := a.projects.SelectAll()
 	ts, err := template.ParseFiles([]string{
 		"./views/html/home.page.tmpl",
 		"./views/html/base.layout.tmpl",
@@ -49,7 +53,51 @@ func (a *application) listOfProjects(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := ts.Execute(w, nil); err != nil {
+	if err != nil {
+		if err != sql.ErrNoRows {
+			a.serveError(w, r, err)
+			return
+		}
+	}
+
+	if err := ts.Execute(w, projects); err != nil {
+		a.serveError(w, r, err)
+		return
+	}
+
+	a.infoLogger.Println(http.StatusOK)
+}
+
+// singleProject handles requests to /projects/?id
+func (a *application) singleProject(w http.ResponseWriter, r *http.Request) {
+	a.infoLogger.Println(r.Method, r.URL)
+	id := r.URL.Query().Get("id")
+	if strings.TrimSpace(id) == "" {
+		err := errors.New("Invalid id")
+		a.serveError(w, r, err)
+		return
+	}
+	ts, err := template.ParseFiles([]string{
+		"./views/html/todo.page.tmpl",
+		"./views/html/base.layout.tmpl",
+		"./views/html/footer.partial.tmpl",
+	}...)
+
+	if err != nil {
+		a.serveError(w, r, err)
+		return
+	}
+
+	project, err := a.projects.SelectOne(id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			a.infoLogger.Printf("/projects/?id=%v::?%v", id, http.StatusNotFound)
+		}
+		a.serveError(w, r, err)
+		return
+	}
+
+	if err := ts.Execute(w, project); err != nil {
 		a.serveError(w, r, err)
 		return
 	}
