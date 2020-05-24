@@ -1,0 +1,14 @@
+{{template "base" .}}
+{{define "title"}}Your list{{end}}
+
+{{define "body"}}
+
+{{with .}}
+<h2>Your projects</h2>
+<ul>{{range .}} <li>{{.ProjectNumber}} | {{.Title}} | {{.Created}} | {{.Updated}}</li>{{end}}</ul>
+{{else}}
+<p>You have not projects. Add some below</p>
+{{end}}
+<h2>Add project</h2>
+<input type="text" placeholder="enter something here"></input>
+{{end}}

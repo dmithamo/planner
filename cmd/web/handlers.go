@@ -43,7 +43,7 @@ func (a *application) listOfProjects(w http.ResponseWriter, r *http.Request) {
 
 	projects, err := a.projects.SelectAll()
 	ts, err := template.ParseFiles([]string{
-		"./views/html/home.page.tmpl",
+		"./views/html/projects.list.tmpl",
 		"./views/html/base.layout.tmpl",
 		"./views/html/footer.partial.tmpl",
 	}...)
@@ -51,13 +51,6 @@ func (a *application) listOfProjects(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		a.serveError(w, r, err)
 		return
-	}
-
-	if err != nil {
-		if err != sql.ErrNoRows {
-			a.serveError(w, r, err)
-			return
-		}
 	}
 
 	if err := ts.Execute(w, projects); err != nil {
@@ -71,14 +64,18 @@ func (a *application) listOfProjects(w http.ResponseWriter, r *http.Request) {
 // singleProject handles requests to /projects/?id
 func (a *application) singleProject(w http.ResponseWriter, r *http.Request) {
 	a.infoLogger.Println(r.Method, r.URL)
+
 	id := r.URL.Query().Get("id")
-	if strings.TrimSpace(id) == "" {
+	id = strings.TrimSpace(id)
+
+	if id == "" {
 		err := errors.New("Invalid id")
 		a.serveError(w, r, err)
 		return
 	}
+
 	ts, err := template.ParseFiles([]string{
-		"./views/html/todo.page.tmpl",
+		"./views/html/projects.single.tmpl",
 		"./views/html/base.layout.tmpl",
 		"./views/html/footer.partial.tmpl",
 	}...)

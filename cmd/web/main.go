@@ -76,7 +76,7 @@ func init() {
 func main() {
 	app.mux.HandleFunc("/", app.landingPage)
 	app.mux.HandleFunc("/projects/", app.listOfProjects)
-	app.mux.HandleFunc("/projects/?id", app.singleProject)
+	app.mux.HandleFunc("/projects/details/", app.singleProject)
 
 	app.mux.HandleFunc("/settings/", app.settings)
 	app.mux.Handle("/static/", http.StripPrefix("/static", app.staticResServer))

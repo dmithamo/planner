@@ -44,7 +44,7 @@ func (m *Mysql) OpenDB(dsn string) (*sql.DB, error) {
 // References schemas.go for ... schemas
 func (m *Mysql) CreateTables() {
 	for tableName, schema := range schemas {
-		query := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %v (%v)", tableName, schema)
+		query := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %v %v", tableName, schema)
 		m.InfoLogger.Printf("[db] %v", query)
 
 		_, err := m.IDB.Exec(query)

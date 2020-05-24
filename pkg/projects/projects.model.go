@@ -18,11 +18,12 @@ type Projects struct {
 
 // Model represents the fields present in a project
 type Model struct {
-	ID          uuid.UUID `json:"id"`
-	Title       string    `json:"title"`
-	Description string    `json:"description"`
-	Created     time.Time `json:"created"`
-	Updated     time.Time `json:"updated"`
+	ProjectNumber int64     `json:"project_number"`
+	ID            uuid.UUID `json:"id"`
+	Title         string    `json:"title"`
+	Description   string    `json:"description"`
+	Created       time.Time `json:"created"`
+	Updated       time.Time `json:"updated"`
 }
 
 // Insert creates a new project in the db
@@ -32,37 +33,56 @@ func (p *Projects) Insert(title, description string) (*Model, error) {
 		p.ErrorLogger.Println(err)
 		return nil, err
 	}
-	created := time.Now()
-	updated := time.Now()
 
-	query := "INSERT INTO projects (id,title,description,created,updated) VALUES(?,?,?,?,?)"
+	query := "INSERT INTO projects (id,title,description) VALUES(?,?,?,?,?)"
 	p.InfoLogger.Printf("[db::projects] %v (%v)", query, fmt.Sprintf("%v::%v::%v", id, title, description))
 
-	result, err := p.IDB.Exec(query, id, title, description, created, updated)
+	result, err := p.IDB.Exec(query, id, title, description)
 	if err != nil {
 		p.ErrorLogger.Printf("[db::projects] %v", err)
 		return nil, err
 	}
 
-	_, err = result.LastInsertId()
+	lastInsertID, err := result.LastInsertId()
 	if err != nil {
 		p.ErrorLogger.Printf("[db::projects] %v", err)
 		return nil, err
 	}
 
-	newProject := Model{id, title, description, created, updated}
-	p.InfoLogger.Printf("[db::projects] inserted project::%v::?: OK", id)
+	newProject := Model{
+		ProjectNumber: lastInsertID,
+		ID:            id,
+		Title:         title,
+		Description:   description,
+	}
+
+	p.InfoLogger.Printf("[db::projects] insert project %v?:: OK", lastInsertID)
 	return &newProject, nil
 }
 
-// Select project(s) from the db where title is matched
-func (p *Projects) Select(title string) (*Model, error) {
-	idFromTitle, err := uuid.FromBytes([]byte(title))
+// SelectOne project(s) from the db where title is matched
+func (p *Projects) SelectOne(id string) (*Model, error) {
+	query := "SELECT nu,title,description,created,updated FROM projects WHERE id=?"
+	p.InfoLogger.Printf("[db::projects] %v %v", query, id)
+	proj := &Model{}
+	err := p.IDB.QueryRow(query, id).Scan(
+		&proj.ProjectNumber,
+		&proj.Title,
+		&proj.Description,
+		&proj.Created,
+		&proj.Updated,
+	)
 	if err != nil {
 		return nil, err
 	}
 
-	query := "SELECT FROM projects (id,title,description,created,updated) WHERE id=?"
+	p.InfoLogger.Printf("[db::projects] select project %v?:: OK", proj.ID)
+	return proj, nil
+}
+
+// SelectAll retrieves all the projects present in the db
+func (p *Projects) SelectAll() ([]*Model, error) {
+	query := "SELECT nu,title,description,created,updated FROM projects"
 	p.InfoLogger.Printf("[db::projects] %v", query)
 	row, err := p.IDB.Query(query, idFromTitle)
 	if err != nil {
@@ -70,10 +90,23 @@ func (p *Projects) Select(title string) (*Model, error) {
 		return nil, err
 	}
 
-	proj := Model{}
-	err = row.Scan(&proj.ID, &proj.Title, &proj.Description, &proj.Created, &proj.Updated)
-	if err != nil {
-		p.ErrorLogger.Printf("[db::projects] %v", err)
+	projects := []*Model{}
+	for rows.Next() {
+		proj := &Model{}
+		err = rows.Scan(
+			&proj.ProjectNumber,
+			&proj.Title,
+			&proj.Description,
+			&proj.Created,
+			&proj.Updated,
+		)
+		if err != nil {
+			p.ErrorLogger.Printf("[db::projects] %v", err)
+			return nil, err
+		}
+		projects = append(projects, proj)
+	}
+	if err := rows.Err(); err != nil {
 		return nil, err
 	}
 
