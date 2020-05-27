@@ -13,7 +13,6 @@ import (
 	"github.com/dmithamo/planner/pkg/projects"
 )
 
-type data interface{}
 type application struct {
 	infoLogger      *log.Logger
 	errLogger       *log.Logger

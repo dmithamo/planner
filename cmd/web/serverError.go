@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
-	"runtime/debug"
 )
 
-func (a *application) serveError(w http.ResponseWriter, r *http.Request, err error) {
-	errTrace := fmt.Sprintf("%v\n%v", err.Error(), string(debug.Stack()))
+func (a *application) serverError(w http.ResponseWriter, r *http.Request, err error) {
+	// errTrace := fmt.Sprintf("%v\n%v", err.Error(), string(debug.Stack()))
+	errTrace := fmt.Sprintf("%v", err.Error())
 
 	ts, err := template.ParseFiles([]string{
 		"./views/html/error.page.tmpl",
@@ -19,14 +19,21 @@ func (a *application) serveError(w http.ResponseWriter, r *http.Request, err err
 	if err != nil {
 		a.errLogger.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(insertErrMessage(err)))
+		_, writeError := w.Write([]byte(insertErrMessage(err)))
+
+		if writeError != nil {
+			a.errLogger.Fatal("error rendering error page: ", writeError)
+		}
 		return
 	}
 
 	if err := ts.Execute(w, errTrace); err != nil {
 		a.errLogger.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(insertErrMessage(err)))
+		_, writeError := w.Write([]byte(insertErrMessage(err)))
+		if writeError != nil {
+			a.errLogger.Fatal("error rendering error page: ", writeError)
+		}
 		return
 	}
 

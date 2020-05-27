@@ -14,7 +14,7 @@ func (a *application) landingPage(w http.ResponseWriter, r *http.Request) {
 	a.infoLogger.Println(r.Method, r.URL)
 
 	if r.URL.Path != "/" {
-		a.serveError(w, r, fmt.Errorf("resource with URL %v not found", r.URL))
+		a.notFoundErr(w, r, fmt.Errorf("resource with URL `%v` not found", r.URL))
 		return
 	}
 
@@ -26,12 +26,12 @@ func (a *application) landingPage(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		a.errLogger.Println(err)
-		a.serveError(w, r, err)
+		a.serverError(w, r, err)
 		return
 	}
 
 	if err := ts.Execute(w, nil); err != nil {
-		a.serveError(w, r, err)
+		a.serverError(w, r, err)
 		return
 	}
 	a.infoLogger.Println(http.StatusOK)
@@ -42,6 +42,10 @@ func (a *application) listOfProjects(w http.ResponseWriter, r *http.Request) {
 	a.infoLogger.Println(r.Method, r.URL)
 
 	projects, err := a.projects.SelectAll()
+	if err != nil {
+		a.serverError(w, r, err)
+	}
+
 	ts, err := template.ParseFiles([]string{
 		"./views/html/projects.list.tmpl",
 		"./views/html/base.layout.tmpl",
@@ -49,12 +53,12 @@ func (a *application) listOfProjects(w http.ResponseWriter, r *http.Request) {
 	}...)
 
 	if err != nil {
-		a.serveError(w, r, err)
+		a.serverError(w, r, err)
 		return
 	}
 
 	if err := ts.Execute(w, projects); err != nil {
-		a.serveError(w, r, err)
+		a.serverError(w, r, err)
 		return
 	}
 
@@ -70,7 +74,7 @@ func (a *application) singleProject(w http.ResponseWriter, r *http.Request) {
 
 	if id == "" {
 		err := errors.New("Invalid id")
-		a.serveError(w, r, err)
+		a.serverError(w, r, err)
 		return
 	}
 
@@ -81,21 +85,23 @@ func (a *application) singleProject(w http.ResponseWriter, r *http.Request) {
 	}...)
 
 	if err != nil {
-		a.serveError(w, r, err)
+		a.serverError(w, r, err)
 		return
 	}
 
 	project, err := a.projects.SelectOne(id)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			a.infoLogger.Printf("/projects/?id=%v::?%v", id, http.StatusNotFound)
+			a.notFoundErr(w, r, fmt.Errorf("project with id `%s` not found", id))
+			return
 		}
-		a.serveError(w, r, err)
+
+		a.serverError(w, r, err)
 		return
 	}
 
 	if err := ts.Execute(w, project); err != nil {
-		a.serveError(w, r, err)
+		a.serverError(w, r, err)
 		return
 	}
 
@@ -114,12 +120,12 @@ func (a *application) settings(w http.ResponseWriter, r *http.Request) {
 	}...)
 
 	if err != nil {
-		a.serveError(w, r, err)
+		a.serverError(w, r, err)
 		return
 	}
 
 	if err := ts.Execute(w, nil); err != nil {
-		a.serveError(w, r, err)
+		a.serverError(w, r, err)
 		return
 	}
 	a.infoLogger.Println(http.StatusOK)
