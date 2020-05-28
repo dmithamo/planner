@@ -43,7 +43,7 @@ func init() {
 	logservice.AttachLogFile()
 
 	dbservice := &mysql.Mysql{}
-	db, _ := dbservice.OpenDB(*dsn)
+	db, _ := dbservice.OpenDB(fmt.Sprintf("%v?parseTime=true", *dsn))
 	dbservice.IDB = db
 	// defer db.Close() <- This is not necessary. Or is it? TODO
 	dbservice.DropTables()
@@ -51,9 +51,7 @@ func init() {
 
 	// instantiate projects model
 	projects := projects.Projects{
-		IDB:         db,
-		InfoLogger:  logservice.InfoLogger,
-		ErrorLogger: logservice.ErrorLogger,
+		IDB: db,
 	}
 
 	staticDir := "./views/static"
