@@ -4,12 +4,11 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"html/template"
 	"net/http"
 	"strings"
 )
 
-// landingPage handles requests to /
+// landingPage handles requests to / <that is to say, root>
 func (a *application) landingPage(w http.ResponseWriter, r *http.Request) {
 	a.infoLogger.Println(r.Method, r.URL)
 
@@ -18,23 +17,7 @@ func (a *application) landingPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ts, err := template.ParseFiles([]string{
-		"./views/html/auth.page.tmpl",
-		"./views/html/base.layout.tmpl",
-		"./views/html/footer.partial.tmpl",
-	}...)
-
-	if err != nil {
-		a.errLogger.Println(err)
-		a.serverError(w, r, err)
-		return
-	}
-
-	if err := ts.Execute(w, nil); err != nil {
-		a.serverError(w, r, err)
-		return
-	}
-	a.infoLogger.Println(http.StatusOK)
+	a.renderTemplate("auth.page.tmpl", nil, w, r)
 }
 
 // ad handles requests to /list/listOfProjects
@@ -46,26 +29,10 @@ func (a *application) listOfProjects(w http.ResponseWriter, r *http.Request) {
 		a.serverError(w, r, err)
 	}
 
-	ts, err := template.ParseFiles([]string{
-		"./views/html/projects.list.tmpl",
-		"./views/html/base.layout.tmpl",
-		"./views/html/footer.partial.tmpl",
-	}...)
-
-	if err != nil {
-		a.serverError(w, r, err)
-		return
-	}
-
-	if err := ts.Execute(w, projects); err != nil {
-		a.serverError(w, r, err)
-		return
-	}
-
-	a.infoLogger.Println(http.StatusOK)
+	a.renderTemplate("projects.page.tmpl", projects, w, r)
 }
 
-// singleProject handles requests to /projects/?id
+// singleProject handles requests to /projects/details/?id
 func (a *application) singleProject(w http.ResponseWriter, r *http.Request) {
 	a.infoLogger.Println(r.Method, r.URL)
 
@@ -78,55 +45,26 @@ func (a *application) singleProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ts, err := template.ParseFiles([]string{
-		"./views/html/projects.single.tmpl",
-		"./views/html/base.layout.tmpl",
-		"./views/html/footer.partial.tmpl",
-	}...)
-
-	if err != nil {
-		a.serverError(w, r, err)
-		return
-	}
-
 	project, err := a.projects.SelectOne(id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			a.notFoundErr(w, r, fmt.Errorf("project with id `%s` not found", id))
 			return
 		}
-
 		a.serverError(w, r, err)
 		return
 	}
 
-	if err := ts.Execute(w, project); err != nil {
-		a.serverError(w, r, err)
-		return
-	}
-
+<<<<<<< HEAD
 	a.projects.Insert("I am the stone that the builder refused", "No description")
 	a.infoLogger.Println(http.StatusOK)
+=======
+	a.renderTemplate("project.page.tmpl", project, w, r)
+>>>>>>> feat(cache): build a cache of templates for efficiency
 }
 
 // settings handles requests to /settings
 func (a *application) settings(w http.ResponseWriter, r *http.Request) {
 	a.infoLogger.Println(r.Method, r.URL)
-
-	ts, err := template.ParseFiles([]string{
-		"./views/html/settings.page.tmpl",
-		"./views/html/base.layout.tmpl",
-		"./views/html/footer.partial.tmpl",
-	}...)
-
-	if err != nil {
-		a.serverError(w, r, err)
-		return
-	}
-
-	if err := ts.Execute(w, nil); err != nil {
-		a.serverError(w, r, err)
-		return
-	}
-	a.infoLogger.Println(http.StatusOK)
+	a.renderTemplate("settings.page.tmpl", nil, w, r)
 }

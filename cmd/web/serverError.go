@@ -1,29 +1,25 @@
 package main
 
 import (
+	"errors"
 	"fmt"
-	"html/template"
 	"net/http"
+	"runtime/debug"
 )
 
+// serverError renders server errors in a special page.
 func (a *application) serverError(w http.ResponseWriter, r *http.Request, err error) {
-	// errTrace := fmt.Sprintf("%v\n%v", err.Error(), string(debug.Stack()))
-	errTrace := fmt.Sprintf("%v", err.Error())
+	errTrace := ""
+	// limit error info output for production env
+	if a.isDevEnv {
+		errTrace = fmt.Sprintf("%v\n%v", err.Error(), string(debug.Stack()))
+	} else {
+		errTrace = fmt.Sprintf("%v", err.Error())
+	}
 
-	ts, err := template.ParseFiles([]string{
-		"./views/html/error.page.tmpl",
-		"./views/html/base.layout.tmpl",
-		"./views/html/footer.partial.tmpl",
-	}...)
-
-	if err != nil {
-		a.errLogger.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
-		_, writeError := w.Write([]byte(insertErrMessage(err)))
-
-		if writeError != nil {
-			a.errLogger.Fatal("error rendering error page: ", writeError)
-		}
+	ts, ok := a.templates["serverError.page.tmpl"]
+	if !ok {
+		a.errLogger.Fatal("app run::server error page::fail ", errors.New("template not found"))
 		return
 	}
 
@@ -32,7 +28,7 @@ func (a *application) serverError(w http.ResponseWriter, r *http.Request, err er
 		w.WriteHeader(http.StatusInternalServerError)
 		_, writeError := w.Write([]byte(insertErrMessage(err)))
 		if writeError != nil {
-			a.errLogger.Fatal("error rendering error page: ", writeError)
+			a.errLogger.Fatal("error rendering error page: ", writeError) // this is funny.
 		}
 		return
 	}
