@@ -1,21 +1,16 @@
 {{define "base"}}
 <html lang="eng">
   <head>
-    <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@300;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,200;0,400;0,500;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/main.css">
     <link rel="shortcut icon" href="/static/img/favicon.ico">
-    <title>{{template "title" .}} - TodoList</title>
+    <title> Planner::{{template "title" .}}</title>
   </head>
   <body>
     <nav>
-      <span>
-        <a href="/">home</a>
-        <a href="/list/">your list</a>
-      </span>
-      <span>
-        <a href="/settings">settings</a>
-        <a href="/">logout</a>
-      </span>
+      <a href="/">home</a>
+      <a href="/projects/">projects</a>
+      <a href="/settings">settings</a>
     </nav>
     <section>
       <div>

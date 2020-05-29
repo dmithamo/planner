@@ -1,27 +1,22 @@
 * {
-	font-family: 'Inconsolata', monospace !important;
-	font-weight: 300 !important;
+	font-family: 'IBM Plex Mono', monospace !important;
+	font-weight: 400 !important;
+	box-sizing: border-box;
 }
 
 body,
 html {
 	margin: 0;
 	padding: 0;
-	background-color: rgb(245, 245, 245);
-	color: rgba(32, 32, 32, 0.856);
+	background-color: rgb(231, 231, 231);
+	color: rgba(20, 20, 20, 0.856);
 	height: 100vh;
+	width: 100%;
 }
 
 body {
-	display: grid;
-	grid-template-columns: 1fr 12fr;
-}
-a {
-	color: rgb(32, 32, 32, 0.856);
-}
-
-a:hover {
-	color: rgb(0, 0, 0);
+	display: flex;
+	flex-direction: column;
 }
 
 h1,
@@ -30,8 +25,11 @@ h3,
 h4,
 h5,
 h6,
-p {
+p,
+ul,
+li {
 	margin: 0;
+	padding: 0;
 }
 
 h1,
@@ -44,51 +42,36 @@ h6 {
 }
 
 nav {
-	height: 100vh;
-	background-color: rgb(5, 76, 170);
-	display: flex;
-	flex-direction: column;
-	justify-content: flex-start;
-	align-items: flex-start;
-}
-
-nav > span {
-	padding: 0.5em;
-	display: flex;
-	flex-direction: column;
-}
-
-nav > span:first-of-type {
-	flex-grow: 1;
-}
-
-nav > span > a {
-	padding: 0 1em;
-	color: rgb(195, 195, 195);
-	text-decoration: none;
 	width: 100%;
-	font-weight: bold;
+	font-weight: 500;
+	display: flex;
+	justify-content: space-evenly;
+	align-items: center;
+	padding: 2em;
+	border-bottom: 2px solid black;
 }
 
-nav > span > a:hover,
-nav > span > a:active,
-nav > span > a.selected {
-	color: white;
+
+nav a {
+	padding: 0 1em;
+	text-decoration: none;
+	text-transform: capitalize;
+	color: black;
+}
+
+nav a:hover,
+nav a:active {
 	text-decoration: double;
 }
 
-nav > span > a > span {
-	display: grid;
-	grid-template-columns: 1fr 4fr;
-}
-
 section {
+	flex-grow: 1;
 	display: flex;
 	flex-direction: column;
 	height: 100vh;
 }
 
-section > div {
+section div {
 	flex-grow: 1;
 	display: flex;
 	flex-direction: column;
@@ -105,9 +88,32 @@ footer {
 
 pre {
 	background-color: rgb(233, 233, 233);
-	border-radius: 10px;
 	padding: 2em;
 	font-size: 0.8em;
 	font-weight: 500 !important;
 	line-height: 2em;
+	font-style: italic;
+	display: flex;
+	justify-content: center;
+	align-self: center;
+	color: red;
+}
+
+a.home-cta {
+	outline: none;
+	border: none;
+	cursor: pointer;
+	font-weight: bold;
+	margin-top: 2em;
+	border-radius: 5px;
+	padding: 1em 3em;
+	background-color: rgb(9, 102, 223);
+	border: 1px solid  rgba(32, 32, 32, 0.256);
+	color: rgb(255, 255, 255);
+	font-weight: bold !important;
+}
+
+a.home-cta:hover {
+	background-color: rgb(5, 76, 170);
+	border: 1px solid  rgba(32, 32, 32, 0.356);
 }
