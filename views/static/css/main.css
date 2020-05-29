@@ -112,7 +112,7 @@ pre {
 	font-weight: 500 !important;
 	line-height: 2em;
 	font-style: italic;
-	width: 100%;
+	width: fit-content;
 	display: flex;
 	justify-content: center;
 	align-self: center;

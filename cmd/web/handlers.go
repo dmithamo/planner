@@ -55,12 +55,7 @@ func (a *application) singleProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-<<<<<<< HEAD
-	a.projects.Insert("I am the stone that the builder refused", "No description")
-	a.infoLogger.Println(http.StatusOK)
-=======
 	a.renderTemplate("project.page.tmpl", project, w, r)
->>>>>>> feat(cache): build a cache of templates for efficiency
 }
 
 // settings handles requests to /settings

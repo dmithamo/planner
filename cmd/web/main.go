@@ -48,6 +48,7 @@ func init() {
 		logservice = &ilog.Log{
 			LogFile: f,
 		}
+		logservice.Initialize()
 	}
 
 	// instantiate db
