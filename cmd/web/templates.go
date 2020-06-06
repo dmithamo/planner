@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
+	"net/http"
 	"path/filepath"
 	"time"
 )
@@ -41,4 +43,28 @@ func buildTemplatesCache(dir string) (map[string]*template.Template, error) {
 	}
 
 	return cache, nil
+}
+
+// renderTemplate renders tempates used in handlers
+func (a *application) renderTemplate(templateName string, data interface{}, w http.ResponseWriter, r *http.Request) {
+	ts, ok := a.templates[templateName]
+	if !ok {
+		panic(fmt.Errorf("app run::%s::template not found", templateName))
+	}
+
+	if err := ts.Execute(w, data); err != nil {
+		panic(fmt.Errorf("app run::%s::template err::%s", templateName, err))
+	}
+
+	// log response status
+	switch templateName {
+	case "serverError.page.tmpl":
+		a.errLogger.Println(http.StatusInternalServerError)
+
+	case "notFound.page.tmpl":
+		a.errLogger.Println(http.StatusNotFound)
+
+	default:
+		a.infoLogger.Println(http.StatusOK)
+	}
 }

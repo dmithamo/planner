@@ -10,8 +10,6 @@ import (
 
 // landingPage handles requests to / <that is to say, root>
 func (a *application) landingPage(w http.ResponseWriter, r *http.Request) {
-	a.infoLogger.Println(r.Method, r.URL)
-
 	if r.URL.Path != "/" {
 		a.notFoundErr(w, r, fmt.Errorf("resource with URL `%v` not found", r.URL))
 		return
@@ -22,11 +20,9 @@ func (a *application) landingPage(w http.ResponseWriter, r *http.Request) {
 
 // ad handles requests to /list/listOfProjects
 func (a *application) listOfProjects(w http.ResponseWriter, r *http.Request) {
-	a.infoLogger.Println(r.Method, r.URL)
-
 	projects, err := a.templateData.projects.SelectAll()
 	if err != nil {
-		a.serverError(w, r, err)
+		panic(err)
 	}
 
 	a.renderTemplate("projects.page.tmpl", projects, w, r)
@@ -34,15 +30,12 @@ func (a *application) listOfProjects(w http.ResponseWriter, r *http.Request) {
 
 // singleProject handles requests to /projects/details/?id
 func (a *application) singleProject(w http.ResponseWriter, r *http.Request) {
-	a.infoLogger.Println(r.Method, r.URL)
-
 	id := r.URL.Query().Get("id")
 	id = strings.TrimSpace(id)
 
 	if id == "" {
 		err := errors.New("Invalid id")
-		a.serverError(w, r, err)
-		return
+		panic(err)
 	}
 
 	project, err := a.templateData.projects.SelectOne(id)
@@ -51,8 +44,7 @@ func (a *application) singleProject(w http.ResponseWriter, r *http.Request) {
 			a.notFoundErr(w, r, fmt.Errorf("project with id `%s` not found", id))
 			return
 		}
-		a.serverError(w, r, err)
-		return
+		panic(err)
 	}
 
 	a.renderTemplate("project.page.tmpl", project, w, r)
@@ -60,6 +52,5 @@ func (a *application) singleProject(w http.ResponseWriter, r *http.Request) {
 
 // settings handles requests to /settings
 func (a *application) settings(w http.ResponseWriter, r *http.Request) {
-	a.infoLogger.Println(r.Method, r.URL)
 	a.renderTemplate("settings.page.tmpl", nil, w, r)
 }

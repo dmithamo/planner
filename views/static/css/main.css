@@ -87,7 +87,8 @@ footer {
 }
 
 pre {
-	background-color: rgb(233, 233, 233);
+	background-color: rgb(230, 230, 230);
+	box-shadow: 0 0 4px 1px rgba(136, 136, 136, 0.385);
 	padding: 2em;
 	font-size: 0.8em;
 	font-weight: 500 !important;
@@ -103,17 +104,14 @@ a.home-cta {
 	outline: none;
 	border: none;
 	cursor: pointer;
-	font-weight: bold;
-	margin-top: 2em;
+	text-decoration: none;
+	margin: 2em 0;
 	border-radius: 5px;
-	padding: 1em 3em;
+	padding: 1em 2em;
 	background-color: rgb(9, 102, 223);
-	border: 1px solid  rgba(32, 32, 32, 0.256);
 	color: rgb(255, 255, 255);
-	font-weight: bold !important;
 }
 
 a.home-cta:hover {
 	background-color: rgb(5, 76, 170);
-	border: 1px solid  rgba(32, 32, 32, 0.356);
 }
