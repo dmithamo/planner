@@ -1,0 +1,19 @@
+div.container{
+  display: flex;
+  justify-content: start;
+  align-self: center;
+}
+
+div.container-nav {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: flex-start;
+}
+
+div.container-main {
+  flex-grow: 1;
+  display: flex;
+  justify-content: start;
+  align-items: flex-start;
+}

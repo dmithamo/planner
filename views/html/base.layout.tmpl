@@ -3,6 +3,7 @@
   <head>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,200;0,400;0,500;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/css/{{template "title" .}}.css" >
     <link rel="shortcut icon" href="/static/img/favicon.ico">
     <title> Planner::{{template "title" .}}</title>
   </head>
@@ -13,7 +14,7 @@
       <a href="/settings">settings</a>
     </nav>
     <section>
-      <div>
+      <div id="main">
         {{template "body" .}}
       </div>
 

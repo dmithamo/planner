@@ -115,9 +115,11 @@ func init() {
 // main runs an instance of the app
 func main() {
 	app.mux.HandleFunc("/", app.landingPage)
-	app.mux.HandleFunc("/projects", app.listOfProjects)
-	app.mux.HandleFunc("/projects/{projectID}", app.singleProject)
+	app.mux.HandleFunc("/projects", app.listProjects)
+	app.mux.HandleFunc("/projects/create", app.createProject)
+	app.mux.HandleFunc("/projects/{projectID}", app.viewProject)
 	app.mux.HandleFunc("/settings", app.settings)
+	app.mux.NotFoundHandler = http.HandlerFunc(app.notFoundErr)
 	app.mux.PathPrefix("/static/").Handler(http.StripPrefix("/static", app.staticResServer))
 
 	standardMiddleware := alice.New(app.panicRecovery, app.requestLogger, app.auth, app.secureHeaders)
