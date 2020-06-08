@@ -1,0 +1,17 @@
+{{template "base" .}}
+{{define "title"}}Create{{end}}
+
+{{define "body"}}
+<h4>Create new project</h4>
+<form class="project-form" method="POST">
+<div class="input-with-label">
+<label for="title">Project title</label>
+<input type="text" name="title" required>
+</div>
+<div class="input-with-label">
+<label for="description">Project description</label>
+<input type="textarea" name="description" required>
+</div>
+<input type="submit" value="Create">
+</form>
+{{end}}
