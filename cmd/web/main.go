@@ -12,6 +12,7 @@ import (
 	ilog "github.com/dmithamo/planner/pkg/log" // custom logger
 	"github.com/dmithamo/planner/pkg/mysql"
 	"github.com/dmithamo/planner/pkg/projects"
+	"github.com/justinas/alice"
 )
 
 type application struct {
@@ -116,10 +117,11 @@ func main() {
 	app.mux.HandleFunc("/settings/", app.settings)
 	app.mux.Handle("/static/", http.StripPrefix("/static", app.staticResServer))
 
+	standardMiddleware := alice.New(app.panicRecovery, app.requestLogger, app.auth, app.secureHeaders)
 	srv := &http.Server{
 		Addr:     *app.port,
 		ErrorLog: app.errLogger,
-		Handler:  app.panicRecovery(app.auth(app.requestLogger(app.secureHeaders(app.mux)))),
+		Handler:  standardMiddleware.Then(app.mux),
 	}
 
 	app.infoLogger.Printf("app start::start server [127.0.0.1%v]::success", *app.port)
