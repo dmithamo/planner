@@ -12,6 +12,7 @@ import (
 	ilog "github.com/dmithamo/planner/pkg/log" // custom logger
 	"github.com/dmithamo/planner/pkg/mysql"
 	"github.com/dmithamo/planner/pkg/projects"
+	"github.com/justinas/alice"
 )
 
 type application struct {
@@ -45,10 +46,10 @@ func init() {
 	logservice := &ilog.Log{}
 	if *logToFile {
 		year, month, date := time.Now().Date()
-		logFile := fmt.Sprintf("./logs/log-%v-%v-%v.log", year, month, date)
+		logFile := fmt.Sprintf("./log-%v-%v-%v.log", year, month, date)
 		f, err := os.OpenFile(logFile, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0666)
 
-		checkErrorsHelper(err, logservice.ErrorLogger, "app init::logToFile config::fail")
+		checkFatalErrorsHelper(err, logservice.ErrorLogger, "app init::logToFile config::fail")
 		logservice = &ilog.Log{
 			LogFile: f,
 		}
@@ -58,7 +59,7 @@ func init() {
 	// instantiate db
 	dbservice := &mysql.Mysql{}
 	db, err := dbservice.OpenDB(fmt.Sprintf("%v?parseTime=true", *dsn))
-	checkErrorsHelper(err, logservice.ErrorLogger, "app init::db open::fail")
+	checkFatalErrorsHelper(err, logservice.ErrorLogger, "app init::db open::fail")
 	logservice.InfoLogger.Println("app init::db open::success")
 	dbservice.IDB = db
 	// defer db.Close() <- This is not necessary. Or is it? TODO. After reading
@@ -66,11 +67,11 @@ func init() {
 	// recreate tables in db if need be
 	if *recreateDB {
 		err := dbservice.DropTables()
-		checkErrorsHelper(err, logservice.ErrorLogger, "app init::db drop tables::fail")
+		checkFatalErrorsHelper(err, logservice.ErrorLogger, "app init::db drop tables::fail")
 		logservice.InfoLogger.Println("app init::db drop tables::success")
 
 		err = dbservice.CreateTables()
-		checkErrorsHelper(err, logservice.ErrorLogger, "app init::db create tables::fail")
+		checkFatalErrorsHelper(err, logservice.ErrorLogger, "app init::db create tables::fail")
 		logservice.InfoLogger.Println("app init::db create tables::success")
 	}
 
@@ -85,7 +86,7 @@ func init() {
 
 	// instantiate template cache
 	templateCache, err := buildTemplatesCache("./views/html")
-	checkErrorsHelper(err, logservice.ErrorLogger, "app init::templates build cache::fail")
+	checkFatalErrorsHelper(err, logservice.ErrorLogger, "app init::templates build cache::fail")
 	logservice.InfoLogger.Println("app init::templates build cache::success")
 
 	// Avengers, Assemble! <assemble all the things>
@@ -116,10 +117,11 @@ func main() {
 	app.mux.HandleFunc("/settings/", app.settings)
 	app.mux.Handle("/static/", http.StripPrefix("/static", app.staticResServer))
 
+	standardMiddleware := alice.New(app.panicRecovery, app.requestLogger, app.auth, app.secureHeaders)
 	srv := &http.Server{
 		Addr:     *app.port,
 		ErrorLog: app.errLogger,
-		Handler:  app.mux,
+		Handler:  standardMiddleware.Then(app.mux),
 	}
 
 	app.infoLogger.Printf("app start::start server [127.0.0.1%v]::success", *app.port)
