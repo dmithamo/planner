@@ -12,6 +12,7 @@ import (
 	ilog "github.com/dmithamo/planner/pkg/log" // custom logger
 	"github.com/dmithamo/planner/pkg/mysql"
 	"github.com/dmithamo/planner/pkg/projects"
+	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
 )
 
@@ -20,7 +21,7 @@ type application struct {
 	errLogger       *log.Logger
 	port            *string
 	staticResServer http.Handler
-	mux             *http.ServeMux
+	mux             *mux.Router
 	templates       map[string]*template.Template
 	templateData    templateData
 	isDevEnv        bool
@@ -80,21 +81,24 @@ func init() {
 		IDB: db,
 	}
 
-	// instantiate static resources server
-	staticDir := "./views/static"
-	staticResServer := http.FileServer(http.Dir(staticDir))
-
 	// instantiate template cache
 	templateCache, err := buildTemplatesCache("./views/html")
 	checkFatalErrorsHelper(err, logservice.ErrorLogger, "app init::templates build cache::fail")
 	logservice.InfoLogger.Println("app init::templates build cache::success")
+
+	// instantiate router
+	router := mux.NewRouter()
+
+	// instantiate static resources server
+	staticDir := "./views/static"
+	staticResServer := http.FileServer(http.Dir(staticDir))
 
 	// Avengers, Assemble! <assemble all the things>
 	app = &application{
 		port:            port,
 		infoLogger:      logservice.InfoLogger,
 		errLogger:       logservice.ErrorLogger,
-		mux:             http.NewServeMux(),
+		mux:             router,
 		staticResServer: staticResServer,
 		templateData:    templateData{projects: &projects},
 		templates:       templateCache,
@@ -111,11 +115,10 @@ func init() {
 // main runs an instance of the app
 func main() {
 	app.mux.HandleFunc("/", app.landingPage)
-	app.mux.HandleFunc("/projects/", app.listOfProjects)
-	app.mux.HandleFunc("/projects/details/", app.singleProject)
-
-	app.mux.HandleFunc("/settings/", app.settings)
-	app.mux.Handle("/static/", http.StripPrefix("/static", app.staticResServer))
+	app.mux.HandleFunc("/projects", app.listOfProjects)
+	app.mux.HandleFunc("/projects/{projectID}", app.singleProject)
+	app.mux.HandleFunc("/settings", app.settings)
+	app.mux.PathPrefix("/static/").Handler(http.StripPrefix("/static", app.staticResServer))
 
 	standardMiddleware := alice.New(app.panicRecovery, app.requestLogger, app.auth, app.secureHeaders)
 	srv := &http.Server{

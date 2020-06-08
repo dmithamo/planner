@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+
+	"github.com/gorilla/mux"
 )
 
 // landingPage handles requests to / <that is to say, root>
@@ -30,18 +32,18 @@ func (a *application) listOfProjects(w http.ResponseWriter, r *http.Request) {
 
 // singleProject handles requests to /projects/details/?id
 func (a *application) singleProject(w http.ResponseWriter, r *http.Request) {
-	id := r.URL.Query().Get("id")
-	id = strings.TrimSpace(id)
+	projectID := mux.Vars(r)["projectID"]
+	projectID = strings.TrimSpace(projectID)
 
-	if id == "" {
-		err := errors.New("Invalid id")
+	if projectID == "" {
+		err := errors.New("Invalid projectID")
 		panic(err)
 	}
 
-	project, err := a.templateData.projects.SelectOne(id)
+	project, err := a.templateData.projects.SelectOne(projectID)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			a.notFoundErr(w, r, fmt.Errorf("project with id `%s` not found", id))
+			a.notFoundErr(w, r, fmt.Errorf("project with projectID `%s` not found", projectID))
 			return
 		}
 		panic(err)

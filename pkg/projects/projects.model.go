@@ -15,7 +15,7 @@ type Projects struct {
 // Model represents the fields present in a project
 type Model struct {
 	ProjectNumber int64     `json:"project_number"`
-	ID            uuid.UUID `json:"id"`
+	ProjectID     uuid.UUID `json:"id"`
 	Title         string    `json:"title"`
 	Description   string    `json:"description"`
 	Created       time.Time `json:"created"`
@@ -29,7 +29,7 @@ func (p *Projects) Insert(title, description string) (*Model, error) {
 		return nil, err
 	}
 
-	query := "INSERT INTO projects (id,title,description) VALUES(?,?,?,?,?)"
+	query := "INSERT INTO projects (projectID,title,description) VALUES(?,?,?,?,?)"
 	result, err := p.IDB.Exec(query, id, title, description)
 	if err != nil {
 		return nil, err
@@ -42,7 +42,7 @@ func (p *Projects) Insert(title, description string) (*Model, error) {
 
 	newProject := Model{
 		ProjectNumber: lastInsertID,
-		ID:            id,
+		ProjectID:     id,
 		Title:         title,
 		Description:   description,
 	}
@@ -52,7 +52,7 @@ func (p *Projects) Insert(title, description string) (*Model, error) {
 
 // SelectOne project(s) from the db where title is matched
 func (p *Projects) SelectOne(id string) (*Model, error) {
-	query := "SELECT nu,title,description,created,updated FROM projects WHERE id=?"
+	query := "SELECT projectNumber,title,description,created,updated FROM projects WHERE projectID=?"
 	proj := &Model{}
 	err := p.IDB.QueryRow(query, id).Scan(
 		&proj.ProjectNumber,
@@ -70,7 +70,7 @@ func (p *Projects) SelectOne(id string) (*Model, error) {
 
 // SelectAll retrieves all the projects present in the db
 func (p *Projects) SelectAll() ([]*Model, error) {
-	query := "SELECT nu,title,description,created,updated FROM projects"
+	query := "SELECT projectNumber,title,description,created,updated FROM projects"
 	rows, err := p.IDB.Query(query)
 	if err != nil {
 		return nil, err
