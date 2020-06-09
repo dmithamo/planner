@@ -11,15 +11,15 @@ import (
 
 // viewProject handles requests to /projects/details/?id
 func (a *application) viewProject(w http.ResponseWriter, r *http.Request) {
-	projectID := mux.Vars(r)["projectID"]
-	projectID = strings.TrimSpace(projectID)
+	projectSlug := mux.Vars(r)["projectSlug"]
+	projectSlug = strings.TrimSpace(projectSlug)
 
-	if projectID == "" {
-		err := errors.New("Invalid projectID")
+	if projectSlug == "" {
+		err := errors.New("Invalid projectSlug")
 		panic(err)
 	}
 
-	project, err := a.templateData.projects.SelectOne(projectID)
+	project, err := a.templateData.projects.SelectOne(projectSlug)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			a.notFoundErr(w, r)

@@ -3,18 +3,23 @@
 {{define "title"}}projects{{end}}
 
 {{define "body"}}
-<form class="project-form" method="POST">
-<p class="form-header">Create new project</p>
-<div class="input-with-label">
-<label for="title">Project title</label>
-<input type="text" name="title" required>
-<p class="input-help">A good title is short and memorable. Something like <span class="title-suggestion">Timeline</span></p>
-</div>
-<div class="input-with-label">
-<label for="description">Project description</label>
-<input type="textarea" name="description" required>
-<p class="input-help">The description is a summary on what this project is about. It sheds more light on the (possibly obsure) title used above</p>
-</div>
-<input type="submit" value="Create">
+<form autocomplete="off" class="project-form" method="POST">
+  <p class="form-header">
+    <span>Create new project</span>
+    <a class="cancel-btn" href="/">Cancel</a>
+  </p>
+  <div class="form-body">
+    <div class="input-with-label">
+      <label class="input-label" for="title">Project title</label>
+      <input class="cta" type="text" name="title" required>
+      <p class="input-help">A good title is short and memorable. Something like <span class="title-suggestion">Timeline</span></p>
+    </div>
+    <div class="input-with-label">
+      <label class="input-label" for="description">Project description</label>
+      <input class="cta" type="textarea" name="description" required>
+      <p class="input-help">The description sheds more light on the (possibly obsure) title used above</p>
+    </div>
+    <input class="cta" type="submit" value="Create">
+  </div>
 </form>
 {{end}}

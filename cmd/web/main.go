@@ -117,7 +117,7 @@ func main() {
 	app.mux.HandleFunc("/auth", app.landingPage)
 	app.mux.HandleFunc("/", app.listProjects)
 	app.mux.HandleFunc("/projects/create", app.createProject)
-	app.mux.HandleFunc("/projects/{projectID}", app.viewProject)
+	app.mux.HandleFunc("/projects/{projectSlug}", app.viewProject)
 	app.mux.HandleFunc("/settings", app.settings)
 	app.mux.NotFoundHandler = http.HandlerFunc(app.notFoundErr)
 	app.mux.PathPrefix("/static/").Handler(http.StripPrefix("/static", app.staticResServer))

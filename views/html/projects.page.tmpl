@@ -3,20 +3,18 @@
 {{define "body"}}
 <div class="container">
   <div class="container-nav">
-    <p class="nav-header">
-      <span>Projects</span>
-      <a class="cta create-new" href="/projects/create">New &rarr;</a>
-    </p>
+    <a class="create-new" href="/projects/create">New &rarr;</a>
+  </div>
+  <div class="container-main">
     {{with .}}
-    <ul class="nav-list">
-    {{range .}}
-    <li><a href="/projects/{{.ProjectID}}">{{.Title}}</a></li>
-    {{end}}
-    </ul>
+      <ul class="nav-list">
+        {{range .}}
+        <li class="project-card"><a href="/projects/{{.ProjectSlug}}">{{.Title}}</a></li>
+        {{end}}
+      </ul>
     {{else}}
-    0 Projects
+    <p>0 Projects</p>
     {{end}}
   </div>
-  <div class="container-main">There will be stuff here (useful stuff)</div>
 </div>
 {{end}}

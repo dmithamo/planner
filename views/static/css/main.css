@@ -61,9 +61,9 @@ nav div a {
 	color: rgba(43, 42, 42, 0.856);
 }
 
-nav div a:hover,
-nav div a:active {
-	text-decoration: double;
+nav div a:hover{
+	color: rgb(0, 0, 0);
+	text-decoration: underline;
 }
 
 nav div{
@@ -77,7 +77,7 @@ nav div.nav-right {
 	justify-content: flex-end;
 }
 
-input.search {
+input.cta {
 	padding: 1em;
 	outline: none;
 	border: none;
@@ -86,7 +86,7 @@ input.search {
 	box-shadow: 0 0 1px 1px rgb(228, 228, 228);
 }
 
-input.search:focus {
+input.cta:focus {
 	background-color: rgb(255, 255, 255);
 	box-shadow: 0 0 1px 1px rgb(209, 209, 209);
 }
