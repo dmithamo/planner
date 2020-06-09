@@ -2,6 +2,7 @@ package projects
 
 import (
 	"database/sql"
+	"fmt"
 	"strings"
 	"time"
 
@@ -30,34 +31,26 @@ func makeSlug(title string) string {
 }
 
 // Insert creates a new project in the db
-func (p *Projects) Insert(title, description string) (*Model, error) {
+func (p *Projects) Insert(title, description string) (string, error) {
 	id, err := uuid.NewUUID()
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	projectSlug := makeSlug(title)
+	projectSlug := strings.ToLower(makeSlug(title))
 
-	query := "INSERT INTO projects (projectID,projectSlug,title,description) VALUES(?,?,?,?,?,?)"
-	result, err := p.IDB.Exec(query, id, title, projectSlug, description)
+	query := "INSERT INTO projects (projectID,projectSlug,title,description) VALUES(?,?,?,?)"
+	result, err := p.IDB.Exec(query, id, projectSlug, title, description)
 	if err != nil {
-		return nil, err
+		return "", fmt.Errorf("insert error %v", err)
 	}
 
-	lastInsertID, err := result.LastInsertId()
+	_, err = result.LastInsertId()
 	if err != nil {
-		return nil, err
+		return "", fmt.Errorf("lastInsertID() error %v", err)
 	}
 
-	newProject := Model{
-		ProjectNumber: lastInsertID,
-		ProjectID:     id,
-		ProjectSlug:   projectSlug,
-		Title:         title,
-		Description:   description,
-	}
-
-	return &newProject, nil
+	return projectSlug, nil
 }
 
 // SelectOne project(s) from the db where title is matched
