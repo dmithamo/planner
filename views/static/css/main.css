@@ -8,10 +8,11 @@ body,
 html {
 	margin: 0;
 	padding: 0;
-	background-color: rgb(231, 231, 231);
-	color: rgba(20, 20, 20, 0.856);
+	background-color: rgba(255, 255, 255, 0.726);
+	color: rgba(43, 42, 42, 0.856);
 	height: 100vh;
 	width: 100%;
+	overflow: hidden;
 }
 
 body {
@@ -45,39 +46,63 @@ nav {
 	width: 100%;
 	font-weight: 500;
 	display: flex;
-	justify-content: space-evenly;
+	justify-content: space-between;
 	align-items: center;
 	padding: 1em;
-	background-color: black;
+	box-shadow: 0 0 1px 1px rgb(211, 211, 211);
 }
 
 
-nav a {
+
+nav div a {
 	padding: 0 1em;
 	text-decoration: none;
 	text-transform: capitalize;
-	color: rgb(221, 221, 221);
+	color: rgba(43, 42, 42, 0.856);
 }
 
-nav a:hover,
-nav a:active {
+nav div a:hover,
+nav div a:active {
 	text-decoration: double;
+}
+
+nav div{
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+	width: 70%;
+}
+
+nav div.nav-right {
+	justify-content: flex-end;
+}
+
+input.search {
+	padding: 1em;
+	outline: none;
+	border: none;
+	background-color: rgba(246, 246, 246, 0.883);
+	border-radius: 6px;
+	box-shadow: 0 0 1px 1px rgb(228, 228, 228);
+}
+
+input.search:focus {
+	background-color: rgb(255, 255, 255);
+	box-shadow: 0 0 1px 1px rgb(209, 209, 209);
+}
+
+input.nav-search {
+	flex-grow: 1;
 }
 
 section {
 	flex-grow: 1;
 	display: flex;
 	flex-direction: column;
-	height: 100vh;
 }
 
 section div#main {
-	padding: 1em;
 	flex-grow: 1;
-	display: flex;
-	flex-direction: column;
-	justify-content: flex-start;
-	align-items: center;
 }
 
 footer {
@@ -88,8 +113,8 @@ footer {
 }
 
 pre {
-	background-color: rgb(230, 230, 230);
-	box-shadow: 0 0 4px 1px rgba(136, 136, 136, 0.385);
+	background-color: rgb(243, 243, 243);
+	box-shadow: 0 0 1px 1px rgba(192, 192, 192, 0.385);
 	padding: 2em;
 	font-size: 0.8em;
 	font-weight: 500 !important;
@@ -115,4 +140,14 @@ a.home-cta {
 
 a.home-cta:hover {
 	background-color: rgb(5, 76, 170);
+}
+
+
+/* Generals */
+div.center-vertical {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	height: 90vh;
 }

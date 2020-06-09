@@ -1,9 +1,11 @@
 {{template "base" .}}
-{{define "title"}}Not found{{end}}
+{{define "title"}}404{{end}}
 {{define "body"}}
-<h2>We looked everywhere :(</h2>
-<pre>{{.}}</pre>
-<a class="home-cta" href="/">
-  Go home
-</a>
+<div class="center-vertical">
+  <h2>We looked everywhere :(</h2>
+  <pre>{{.}}</pre>
+  <a class="home-cta" href="/">
+    Go home
+  </a>
+</div>
 {{end}}
