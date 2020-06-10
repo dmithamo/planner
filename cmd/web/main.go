@@ -10,6 +10,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/dmithamo/planner/pkg/form"
 	ilog "github.com/dmithamo/planner/pkg/log" // custom logger
 	"github.com/dmithamo/planner/pkg/mysql"
 	"github.com/dmithamo/planner/pkg/projects"
@@ -30,17 +31,17 @@ type application struct {
 }
 
 type templateData struct {
-	Project   *projects.Model
-	Projects  []*projects.Model
-	FormData  *url.Values
-	FormErrs  *formErrs
-	ServerErr error
+	Project  *projects.Model
+	Projects []*projects.Model
+	Form     *form.Form
+	Error    error
 }
-
-type formErrs map[string]string
 
 // make this global to both init() and main() to keep main() short
 var app *application
+
+// for use in both main && create handler
+var initialForm = &form.Form{ValidationErrs: nil, Values: url.Values{}}
 
 // init *injects dependencies into an instance of the app
 func init() {
@@ -114,7 +115,7 @@ func init() {
 		mux:             router,
 		staticResServer: staticResServer,
 		projects:        &projects,
-		templateData:    templateData{},
+		templateData:    templateData{Form: initialForm},
 		templates:       templateCache,
 		isDevEnv:        *isDevEnv,
 	}
@@ -130,7 +131,9 @@ func main() {
 	app.mux.HandleFunc("/projects/create", app.createproject).Methods("POST")
 	app.mux.HandleFunc("/projects/slug/{projectSlug}", app.viewProject)
 	app.mux.HandleFunc("/settings", app.settings)
+
 	app.mux.NotFoundHandler = http.HandlerFunc(app.notFoundErr)
+
 	app.mux.PathPrefix("/static/").Handler(http.StripPrefix("/static", app.staticResServer))
 
 	standardMiddleware := alice.New(app.panicRecovery, app.requestLogger, app.auth, app.secureHeaders)

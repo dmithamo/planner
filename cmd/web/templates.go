@@ -46,40 +46,10 @@ func buildTemplatesCache(dir string) (map[string]*template.Template, error) {
 }
 
 // renderTemplate renders tempates used in handlers
-func (a *application) renderTemplate(templateName string, w http.ResponseWriter, r *http.Request) {
+func (a *application) renderTemplate(templateName string, w http.ResponseWriter, data templateData) {
 	ts, ok := a.templates[templateName]
 	if !ok {
 		panic(fmt.Errorf("app run::%s::template not found", templateName))
-	}
-
-	var data interface{}
-	switch {
-	case templateName == "serverError.page.tmpl":
-		data = a.templateData.ServerErr
-
-	case templateName == "notFound.page.tmpl":
-		data = fmt.Errorf("resource with url `%s` not found", r.URL.Path)
-
-	case templateName == "auth.page.tmpl":
-		data = nil
-
-	case templateName == "settings.page.tmpl":
-		data = nil
-
-	case templateName == "projects.page.tmpl":
-		data = a.templateData.Projects
-
-	case templateName == "project.page.tmpl":
-		data = a.templateData.Project
-
-	case templateName == "create.page.tmpl":
-		data = map[string]interface{}{
-			"formData": a.templateData.FormData,
-			"formErrs": a.templateData.FormErrs,
-		}
-
-	default:
-		panic(fmt.Errorf("app run::unknown template::%s", templateName))
 	}
 
 	if err := ts.Execute(w, data); err != nil {

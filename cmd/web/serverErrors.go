@@ -6,7 +6,7 @@ import (
 	"runtime/debug"
 )
 
-// serverError renders server errors in a special page.
+// serverError renders server errors in a pop up.
 func (a *application) serverError(w http.ResponseWriter, r *http.Request, err error) {
 	var errTrace error
 	// limit error info output for production env
@@ -16,7 +16,6 @@ func (a *application) serverError(w http.ResponseWriter, r *http.Request, err er
 		errTrace = fmt.Errorf("%v", err.Error())
 	}
 
-	a.templateData.ServerErr = errTrace
-	a.errLogger.Printf("app run::err %v::resource with url `%s` not found", http.StatusInternalServerError, errTrace)
-	a.renderTemplate("serverError.page.tmpl", w, r)
+	a.renderTemplate("serverError.page.tmpl", w, templateData{Error: errTrace})
+	a.errLogger.Printf("app run::err %v::%s", http.StatusInternalServerError, errTrace)
 }

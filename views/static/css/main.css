@@ -52,8 +52,6 @@ nav {
 	box-shadow: 0 0 1px 1px rgb(211, 211, 211);
 }
 
-
-
 nav div a {
 	padding: 0 1em;
 	text-decoration: none;
@@ -61,12 +59,12 @@ nav div a {
 	color: rgba(43, 42, 42, 0.856);
 }
 
-nav div a:hover{
+nav div a:hover {
 	color: rgb(0, 0, 0);
 	text-decoration: underline;
 }
 
-nav div{
+nav div {
 	display: flex;
 	align-items: center;
 	justify-content: flex-start;
@@ -142,7 +140,6 @@ a.home-cta:hover {
 	background-color: rgb(5, 76, 170);
 }
 
-
 /* Generals */
 div.center-vertical {
 	display: flex;
@@ -151,4 +148,10 @@ div.center-vertical {
 	align-items: center;
 	min-height: 90vh;
 	height: auto;
+}
+
+div.server-error {
+	position: absolute;
+	top: 0;
+	left: 0;
 }

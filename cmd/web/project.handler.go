@@ -29,6 +29,5 @@ func (a *application) viewProject(w http.ResponseWriter, r *http.Request) {
 	}
 
 	a.infoLogger.Printf("app run::response::%v", http.StatusOK)
-	a.templateData.Project = project
-	a.renderTemplate("project.page.tmpl", w, r)
+	a.renderTemplate("project.page.tmpl", w, templateData{Project: project})
 }
