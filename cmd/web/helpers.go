@@ -2,12 +2,11 @@ package main
 
 import (
 	"fmt"
-	"log"
 )
 
 // checkErrsHelper checks for fatal errors, logs them, and shuts down the app
-func checkFatalErrorsHelper(err error, logger *log.Logger, msg string) {
+func checkFatalErrorsHelper(err error, msg string) {
 	if err != nil {
-		logger.Fatal(fmt.Sprintf("%s::%s", msg, err))
+		panic(fmt.Sprintf("%s::%s", msg, err))
 	}
 }

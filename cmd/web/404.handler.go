@@ -1,11 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 )
 
 // notFoundErr renders the 404 page
 func (a *application) notFoundErr(w http.ResponseWriter, r *http.Request) {
-	a.renderTemplate("notFound.page.tmpl", fmt.Errorf("resource with url `%s` not found", r.URL.Path), w, r)
+	a.errLogger.Printf("app run::err %v::resource with url `%s` not found", http.StatusNotFound, r.URL.Path)
+	a.renderTemplate("notFound.page.tmpl", w, r)
 }

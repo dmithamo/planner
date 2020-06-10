@@ -46,25 +46,43 @@ func buildTemplatesCache(dir string) (map[string]*template.Template, error) {
 }
 
 // renderTemplate renders tempates used in handlers
-func (a *application) renderTemplate(templateName string, data interface{}, w http.ResponseWriter, r *http.Request) {
+func (a *application) renderTemplate(templateName string, w http.ResponseWriter, r *http.Request) {
 	ts, ok := a.templates[templateName]
 	if !ok {
 		panic(fmt.Errorf("app run::%s::template not found", templateName))
 	}
 
-	if err := ts.Execute(w, data); err != nil {
-		panic(fmt.Errorf("app run::%s::template err::%s", templateName, err))
-	}
+	var data interface{}
+	switch {
+	case templateName == "serverError.page.tmpl":
+		data = a.templateData.ServerErr
 
-	// log response status
-	switch templateName {
-	case "serverError.page.tmpl":
-		a.errLogger.Println(http.StatusInternalServerError)
+	case templateName == "notFound.page.tmpl":
+		data = fmt.Errorf("resource with url `%s` not found", r.URL.Path)
 
-	case "notFound.page.tmpl":
-		a.errLogger.Println(http.StatusNotFound)
+	case templateName == "auth.page.tmpl":
+		data = nil
+
+	case templateName == "settings.page.tmpl":
+		data = nil
+
+	case templateName == "projects.page.tmpl":
+		data = a.templateData.Projects
+
+	case templateName == "project.page.tmpl":
+		data = a.templateData.Project
+
+	case templateName == "create.page.tmpl":
+		data = map[string]interface{}{
+			"formData": a.templateData.FormData,
+			"formErrs": a.templateData.FormErrs,
+		}
 
 	default:
-		a.infoLogger.Println(http.StatusOK)
+		panic(fmt.Errorf("app run::unknown template::%s", templateName))
+	}
+
+	if err := ts.Execute(w, data); err != nil {
+		panic(fmt.Errorf("app run::%s::template err::%s", templateName, err))
 	}
 }

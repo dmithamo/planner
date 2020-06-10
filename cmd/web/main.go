@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"time"
 
@@ -22,14 +23,21 @@ type application struct {
 	port            *string
 	staticResServer http.Handler
 	mux             *mux.Router
+	projects        *projects.Projects
 	templates       map[string]*template.Template
 	templateData    templateData
 	isDevEnv        bool
 }
 
 type templateData struct {
-	projects *projects.Projects
+	Project   *projects.Model
+	Projects  []*projects.Model
+	FormData  *url.Values
+	FormErrs  *formErrs
+	ServerErr error
 }
+
+type formErrs map[string]string
 
 // make this global to both init() and main() to keep main() short
 var app *application
@@ -50,17 +58,22 @@ func init() {
 		logFile := fmt.Sprintf("./log-%v-%v-%v.log", year, month, date)
 		f, err := os.OpenFile(logFile, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0666)
 
-		checkFatalErrorsHelper(err, logservice.ErrorLogger, "app init::logToFile config::fail")
+		checkFatalErrorsHelper(err, "app init::logToFile config::fail")
 		logservice = &ilog.Log{
 			LogFile: f,
 		}
 		logservice.Initialize()
 	}
 
+	// Yes I know this is superflous
+	logservice.InfoLogger.Println("::::::::::::::::::::::::::::::::")
+	logservice.InfoLogger.Println("{re}starting application")
+	logservice.InfoLogger.Println("::::::::::::::::::::::::::::::::")
+
 	// instantiate db
 	dbservice := &mysql.Mysql{}
 	db, err := dbservice.OpenDB(fmt.Sprintf("%v?parseTime=true", *dsn))
-	checkFatalErrorsHelper(err, logservice.ErrorLogger, "app init::db open::fail")
+	checkFatalErrorsHelper(err, "app init::db open::fail")
 	logservice.InfoLogger.Println("app init::db open::success")
 	dbservice.IDB = db
 	// defer db.Close() <- This is not necessary. Or is it? TODO. After reading
@@ -68,11 +81,11 @@ func init() {
 	// recreate tables in db if need be
 	if *recreateDB {
 		err := dbservice.DropTables()
-		checkFatalErrorsHelper(err, logservice.ErrorLogger, "app init::db drop tables::fail")
+		checkFatalErrorsHelper(err, "app init::db drop tables::fail")
 		logservice.InfoLogger.Println("app init::db drop tables::success")
 
 		err = dbservice.CreateTables()
-		checkFatalErrorsHelper(err, logservice.ErrorLogger, "app init::db create tables::fail")
+		checkFatalErrorsHelper(err, "app init::db create tables::fail")
 		logservice.InfoLogger.Println("app init::db create tables::success")
 	}
 
@@ -83,7 +96,7 @@ func init() {
 
 	// instantiate template cache
 	templateCache, err := buildTemplatesCache("./views/html")
-	checkFatalErrorsHelper(err, logservice.ErrorLogger, "app init::templates build cache::fail")
+	checkFatalErrorsHelper(err, "app init::templates build cache::fail")
 	logservice.InfoLogger.Println("app init::templates build cache::success")
 
 	// instantiate router
@@ -100,15 +113,12 @@ func init() {
 		errLogger:       logservice.ErrorLogger,
 		mux:             router,
 		staticResServer: staticResServer,
-		templateData:    templateData{projects: &projects},
+		projects:        &projects,
+		templateData:    templateData{},
 		templates:       templateCache,
 		isDevEnv:        *isDevEnv,
 	}
 
-	// Yes I know this is superflous
-	logservice.InfoLogger.Println("::::::::::::::::::::::::::::::::")
-	logservice.InfoLogger.Println("{re}starting application")
-	logservice.InfoLogger.Println("::::::::::::::::::::::::::::::::")
 	logservice.InfoLogger.Println("app init::success")
 }
 
@@ -116,8 +126,9 @@ func init() {
 func main() {
 	app.mux.HandleFunc("/auth", app.landingPage)
 	app.mux.HandleFunc("/", app.listProjects)
-	app.mux.HandleFunc("/projects/create", app.createProject)
-	app.mux.HandleFunc("/projects/{projectSlug}", app.viewProject)
+	app.mux.HandleFunc("/projects/create", app.showCreateProjectForm).Methods("GET")
+	app.mux.HandleFunc("/projects/create", app.createproject).Methods("POST")
+	app.mux.HandleFunc("/projects/slug/{projectSlug}", app.viewProject)
 	app.mux.HandleFunc("/settings", app.settings)
 	app.mux.NotFoundHandler = http.HandlerFunc(app.notFoundErr)
 	app.mux.PathPrefix("/static/").Handler(http.StripPrefix("/static", app.staticResServer))

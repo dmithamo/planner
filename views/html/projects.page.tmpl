@@ -9,7 +9,7 @@
     {{with .}}
       <ul class="nav-list">
         {{range .}}
-        <li class="project-card"><a href="/projects/{{.ProjectSlug}}">{{.Title}}</a></li>
+        <li class="project-card"><a href="/projects/slug/{{.ProjectSlug}}">{{.Title}}</a></li>
         {{end}}
       </ul>
     {{else}}

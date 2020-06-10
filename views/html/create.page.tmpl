@@ -11,21 +11,30 @@
   <div class="form-body">
     <div class="input-with-label">
       <label class="input-label" for="title">Project title</label>
-      <input class="cta" type="text" name="title" required>
-      {{with .}}
+      <input class="cta {{with .formErrs}}{{if .title}}errored{{end}}{{end}}" type="text" name="title" value='{{ .formData.Get "title"}}' required>
+      {{with .formErrs}}
+      {{with .title}}
       <p class="input-error">{{.}}</p>
+      {{end}}
       {{end}}
       <p class="input-help">A good title is short and memorable. Something like <span class="title-suggestion">Timeline</span></p>
     </div>
     <div class="input-with-label">
       <label class="input-label" for="description">Project description</label>
-      <input class="cta" type="textarea" name="description" required>
-      {{with .}}
+      <input class="cta {{with .formErrs}}{{if .description}}errored{{end}}{{end}}" type="textarea" name="description" value='{{ .formData.Get "description"}}' required>
+      {{with .formErrs}}
+      {{with .description}}
       <p class="input-error">{{.}}</p>
+      {{end}}
       {{end}}
       <p class="input-help">The description sheds more light on the (possibly obsure) title used above</p>
     </div>
     <input class="cta" type="submit" value="Create">
+    {{with .formErrs}}
+    {{with .generic}}
+    <pre>{{.}}</pre>
+    {{end}}
+    {{end}}
   </div>
 </form>
 {{end}}
