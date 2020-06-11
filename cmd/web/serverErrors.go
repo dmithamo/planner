@@ -16,6 +16,6 @@ func (a *application) serverError(w http.ResponseWriter, r *http.Request, err er
 		errTrace = fmt.Errorf("%v", err.Error())
 	}
 
-	a.renderTemplate("serverError.page.tmpl", w, templateData{Error: errTrace})
+	a.renderTemplate("serverError.page.tmpl", w, r, templateData{Error: errTrace})
 	a.errLogger.Printf("app run::err %v::%s", http.StatusInternalServerError, errTrace)
 }

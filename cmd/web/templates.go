@@ -46,13 +46,15 @@ func buildTemplatesCache(dir string) (map[string]*template.Template, error) {
 }
 
 // renderTemplate renders tempates used in handlers
-func (a *application) renderTemplate(templateName string, w http.ResponseWriter, data templateData) {
+func (a *application) renderTemplate(templateName string, w http.ResponseWriter, r *http.Request, data templateData) {
 	ts, ok := a.templates[templateName]
 	if !ok {
-		panic(fmt.Errorf("app run::%s::template not found", templateName))
+		a.serverError(w, r, fmt.Errorf("app run::%s::template not found", templateName))
+		return
 	}
 
 	if err := ts.Execute(w, data); err != nil {
-		panic(fmt.Errorf("app run::%s::template err::%s", templateName, err))
+		a.serverError(w, r, fmt.Errorf("app run::%s::template err::%s", templateName, err))
+		return
 	}
 }
