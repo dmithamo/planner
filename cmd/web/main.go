@@ -30,7 +30,6 @@ type application struct {
 	templateData    templateData
 	isDevEnv        bool
 	session         *sessions.Session
-	secret          string
 }
 
 type templateData struct {
@@ -38,6 +37,7 @@ type templateData struct {
 	Projects []*projects.Model
 	Form     *form.Form
 	Error    error
+	FlashMsg interface{}
 }
 
 // make this global to both init() and main() to keep main() short
@@ -113,8 +113,7 @@ func init() {
 
 	// instantiate session
 	session := sessions.New([]byte(*secret))
-	session.Lifetime = 25 * time.Second
-	session.Persist = true
+	session.Lifetime = 30 * time.Minute
 	session.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
 		panic(err)
 	}
@@ -131,7 +130,6 @@ func init() {
 		templates:       templateCache,
 		isDevEnv:        *isDevEnv,
 		session:         session,
-		secret:          *secret,
 	}
 
 	logservice.InfoLogger.Println("app init::success")
@@ -139,10 +137,8 @@ func init() {
 
 // main runs an instance of the app
 func main() {
-	authMiddleware := alice.New(app.session.Enable)
-
 	secureRouter := app.mux.PathPrefix("").Subrouter() // needs auth
-	authMiddleware.Then(secureRouter)
+	secureRouter.Use(app.session.Enable)
 
 	app.mux.HandleFunc("/auth", app.landingPage)
 	secureRouter.HandleFunc("/", app.listProjects)

@@ -49,12 +49,12 @@ func buildTemplatesCache(dir string) (map[string]*template.Template, error) {
 func (a *application) renderTemplate(templateName string, w http.ResponseWriter, r *http.Request, data templateData) {
 	ts, ok := a.templates[templateName]
 	if !ok {
-		a.serverError(w, r, fmt.Errorf("app run::%s::template not found", templateName))
+		a.serverError(w, r, fmt.Errorf("app run::template not found::`%s`", templateName))
 		return
 	}
 
 	if err := ts.Execute(w, data); err != nil {
-		a.serverError(w, r, fmt.Errorf("app run::%s::template err::%s", templateName, err))
+		a.serverError(w, r, fmt.Errorf("app run::template err::`%s`::%s", templateName, err))
 		return
 	}
 }

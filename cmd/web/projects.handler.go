@@ -75,6 +75,8 @@ func (a *application) createproject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// if we get here, all iz vell
+	a.session.Put(r, "project", fmt.Sprintf("Project with title `%s` created successfully", title))
 	a.infoLogger.Printf("app run::response::%v", http.StatusPermanentRedirect)
 	http.Redirect(w, r, fmt.Sprintf("/projects/slug/%v", projectSlug), http.StatusSeeOther)
 }
