@@ -23,5 +23,5 @@ func (l *Log) Initialize() {
 	}
 
 	l.InfoLogger = log.New(output, "INFO\t", log.Ldate|log.Ltime)
-	l.ErrorLogger = log.New(output, "ERRO\t", log.Ldate|log.Ltime)
+	l.ErrorLogger = log.New(output, "ERRO\t", log.Ldate|log.Ltime|log.Lshortfile)
 }

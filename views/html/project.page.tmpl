@@ -1,7 +1,9 @@
 {{template "base" .}}
-{{define "title"}}Project::{{.Title}}{{end}}
+{{define "title"}}projects{{end}}
 
 {{define "body"}}
+{{with .Project}}
 <h2>{{.Title}} </h2>
 <p><span>{{.ProjectNumber}}</span>|<span>{{.Description}}</span>|<span>{{.Created}}</span></p>
+{{end}}
 {{end}}

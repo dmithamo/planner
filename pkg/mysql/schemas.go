@@ -8,6 +8,7 @@ func init() {
 			(
 				projectNumber MEDIUMINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 				projectID VARCHAR(50) UNIQUE NOT NULL,
+				projectSlug VARCHAR(100) UNIQUE NOT NULL,
 				title VARCHAR(100) UNIQUE NOT NULL,
 				description TEXT NOT NULL,
 				created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

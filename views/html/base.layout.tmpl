@@ -3,23 +3,30 @@
   <head>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,200;0,400;0,500;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/css/{{template "title" .}}.css" >
     <link rel="shortcut icon" href="/static/img/favicon.ico">
     <title> Planner::{{template "title" .}}</title>
   </head>
   <body>
     <nav>
+    <div class="nav-left">
       <a href="/">home</a>
-      <a href="/projects">projects</a>
+      <input class="cta nav-search" placeholder="Search for project by title, description or tags">
+    </div>
+    <div class="nav-right">
+      <a href="#">help</a>
       <a href="/settings">settings</a>
+    </div>
     </nav>
     <section>
-      <div>
+      <div id="main">
         {{template "body" .}}
       </div>
 
+
       {{template "footer" .}}
-      <script src="/static/js/main.js"></script>
     </section>
+    <script src="/static/js/main.js"></script>
   </body>
 </html>
 {{end}}
