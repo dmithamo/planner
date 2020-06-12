@@ -143,8 +143,8 @@ func main() {
 
 	app.mux.HandleFunc("/auth", app.landingPage)
 	secureRouter.HandleFunc("/", app.listProjects)
-	secureRouter.HandleFunc("/projects/create", app.showCreateProjectForm).Methods("GET")
-	secureRouter.HandleFunc("/projects/create", app.createproject).Methods("POST")
+	secureRouter.HandleFunc("/projects/create", app.showCreateProjectForm).Methods(http.MethodGet)
+	secureRouter.HandleFunc("/projects/create", app.createproject).Methods(http.MethodPost)
 	secureRouter.HandleFunc("/projects/slug/{projectSlug}", app.viewProject)
 	secureRouter.HandleFunc("/settings", app.settings)
 	app.mux.NotFoundHandler = http.HandlerFunc(app.notFoundErr)
@@ -159,5 +159,5 @@ func main() {
 
 	app.infoLogger.Printf("app start::start server [127.0.0.1%v]::success", *app.port)
 	app.infoLogger.Println("app start::ready for requests::success")
-	app.errLogger.Fatal("app start::fail", srv.ListenAndServe())
+	app.errLogger.Fatal("app start::fail", srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem"))
 }
