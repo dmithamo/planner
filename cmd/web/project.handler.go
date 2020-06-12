@@ -9,7 +9,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// viewProject handles requests to /projects/details/?id
+// viewProject handles requests to /projects/slug/{projectSlug}
 func (a *application) viewProject(w http.ResponseWriter, r *http.Request) {
 	projectSlug := mux.Vars(r)["projectSlug"]
 	projectSlug = strings.TrimSpace(projectSlug)
@@ -30,8 +30,6 @@ func (a *application) viewProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// flash success msg on redirect
-	msg := a.session.PopString(r, "project")
 	a.infoLogger.Printf("app run::response::%v", http.StatusOK)
-	a.renderTemplate("project.page.tmpl", w, r, templateData{Project: project, FlashMsg: msg})
+	a.renderTemplate("project.page.tmpl", w, r, templateData{Project: project})
 }

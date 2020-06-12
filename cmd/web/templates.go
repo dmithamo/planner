@@ -47,6 +47,10 @@ func buildTemplatesCache(dir string) (map[string]*template.Template, error) {
 
 // renderTemplate renders tempates used in handlers
 func (a *application) renderTemplate(templateName string, w http.ResponseWriter, r *http.Request, data templateData) {
+	// retrieve flash msgs, if any
+	msg := app.session.PopString(r, "flashMsg")
+	data.FlashMsg = msg
+
 	ts, ok := a.templates[templateName]
 	if !ok {
 		a.serverError(w, r, fmt.Errorf("app run::template not found::`%s`", templateName))

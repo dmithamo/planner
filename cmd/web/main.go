@@ -37,7 +37,7 @@ type templateData struct {
 	Projects []*projects.Model
 	Form     *form.Form
 	Error    error
-	FlashMsg interface{}
+	FlashMsg string
 }
 
 // make this global to both init() and main() to keep main() short
@@ -137,6 +137,7 @@ func init() {
 
 // main runs an instance of the app
 func main() {
+	// route all the things
 	secureRouter := app.mux.PathPrefix("").Subrouter() // needs auth
 	secureRouter.Use(app.session.Enable)
 
@@ -146,12 +147,10 @@ func main() {
 	secureRouter.HandleFunc("/projects/create", app.createproject).Methods("POST")
 	secureRouter.HandleFunc("/projects/slug/{projectSlug}", app.viewProject)
 	secureRouter.HandleFunc("/settings", app.settings)
-
 	app.mux.NotFoundHandler = http.HandlerFunc(app.notFoundErr)
-
 	app.mux.PathPrefix("/static/").Handler(http.StripPrefix("/static", app.staticResServer))
-
 	standardMiddleware := alice.New(app.panicRecovery, app.requestLogger, app.secureHeaders)
+
 	srv := &http.Server{
 		Addr:     *app.port,
 		ErrorLog: app.errLogger,

@@ -158,18 +158,13 @@ div.server-error {
 
 div.flash-msg {
 	padding: 1em;
-	position: fixed;
-	bottom: 2px;
-	left: 25%;
-	z-index: 1000;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
-	border-radius: 10px;
-	background-color: #00000075;
+	border-radius: 3px;
+	background-color: #000000;
 	color: white;
-	width: fit-content;
 	margin: auto;
 }
 
@@ -186,6 +181,8 @@ button#close-btn {
 	color: white;
 	cursor: pointer;
 	text-decoration: underline;
+	background-color: none;
+	background: none;
 }
 
 div.full-overlay {
