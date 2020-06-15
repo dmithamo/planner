@@ -66,15 +66,15 @@ form.project-form .form-header span {
 
 form.project-form .form-header a.cancel-btn {
 	padding: 0.8em 1em;
-	background-color: rgb(209, 209, 209);
 	color: inherit;
 	text-decoration: none;
-	border-radius: 10px;
-	opacity: 0.8;
+	border-radius: 2px;
+	opacity: 0.7;
+	transition: all ease-in-out 0.3s;
 }
 
 form.project-form .form-header a.cancel-btn:hover {
-	background-color: rgba(197, 195, 195, 0.815);
+	background-color: rgb(209, 209, 209);
 	opacity: 1;
 }
 

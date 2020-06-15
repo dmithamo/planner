@@ -9,14 +9,15 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// viewProject handles requests to /projects/details/?id
+// viewProject handles requests to /projects/slug/{projectSlug}
 func (a *application) viewProject(w http.ResponseWriter, r *http.Request) {
 	projectSlug := mux.Vars(r)["projectSlug"]
 	projectSlug = strings.TrimSpace(projectSlug)
 
 	if projectSlug == "" {
 		err := errors.New("Invalid projectSlug")
-		panic(err)
+		a.serverError(w, r, err)
+		return
 	}
 
 	project, err := a.projects.SelectOne(projectSlug)
@@ -25,9 +26,10 @@ func (a *application) viewProject(w http.ResponseWriter, r *http.Request) {
 			a.notFoundErr(w, r)
 			return
 		}
-		panic(err)
+		a.serverError(w, r, err)
+		return
 	}
 
 	a.infoLogger.Printf("app run::response::%v", http.StatusOK)
-	a.renderTemplate("project.page.tmpl", w, templateData{Project: project})
+	a.renderTemplate("project.page.tmpl", w, r, templateData{Project: project})
 }

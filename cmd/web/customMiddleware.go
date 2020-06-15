@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"strings"
 )
 
 // requestLogger logs all requests
@@ -23,27 +22,6 @@ func (a *application) secureHeaders(next http.Handler) http.Handler {
 		w.Header().Set("X-Frame-Options", "deny")
 		next.ServeHTTP(w, r)
 	})
-}
-
-func (a *application) auth(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// check auth header
-		if !isAuthorized(r) {
-			// a.landingPage(w, r)
-			http.Redirect(w, r, "/auth", http.StatusSeeOther)
-			return
-		}
-		next.ServeHTTP(w, r)
-	})
-}
-
-// check for auth
-func isAuthorized(r *http.Request) bool {
-	authHeader := r.Header.Get("Authorization")
-	if strings.Contains(r.URL.Path, "static") || strings.Contains(r.URL.Path, "auth") {
-		return true
-	}
-	return authHeader == "" // temp. To correct and flesh out
 }
 
 // panicRecovery recovers from panics

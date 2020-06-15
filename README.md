@@ -42,4 +42,12 @@ This project uses the following open source technologies
 
 ### TODO
 
-Populate this README more verbosely.
+- Populate this README more verbosely.
+- Continue building this as a Monolith
+
+#### Nota Bene
+
+This project is *paused* in favour of an equivalent project using:
+
+- a RESTful API in Go
+- a reactive UI (using one of [React, Vue, or Svelte])

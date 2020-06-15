@@ -3,6 +3,7 @@ package form
 import (
 	"fmt"
 	"net/url"
+	"regexp"
 	"strings"
 	"unicode/utf8"
 )
@@ -61,10 +62,18 @@ func (f *Form) validateLength() {
 }
 
 // validateRequiredFields checks that all required fields are present
+// also checks that only [a-zA-Z0-9_] are present
 func (f *Form) validateRequiredFields() {
+	permissibleChars := regexp.MustCompile(`^[a-zA-Z0-9\ ]+$`)
 	for field := range f.RequiredFields {
-		if len(strings.Trim(f.Values.Get(field), "\t \n")) == 0 {
+		value := f.Values.Get(field)
+
+		if len(strings.Trim(value, "\t \n")) == 0 {
 			f.ValidationErrs.Add(field, "Required!")
+		}
+
+		if !permissibleChars.MatchString(value) {
+			f.ValidationErrs.Add(field, fmt.Sprintf("Invalid %s. Use characters(a-z) and numbers only", field))
 		}
 	}
 }

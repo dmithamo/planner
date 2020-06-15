@@ -14,6 +14,7 @@ import (
 	ilog "github.com/dmithamo/planner/pkg/log" // custom logger
 	"github.com/dmithamo/planner/pkg/mysql"
 	"github.com/dmithamo/planner/pkg/projects"
+	"github.com/golangcollege/sessions"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
 )
@@ -28,6 +29,7 @@ type application struct {
 	templates       map[string]*template.Template
 	templateData    templateData
 	isDevEnv        bool
+	session         *sessions.Session
 }
 
 type templateData struct {
@@ -35,6 +37,7 @@ type templateData struct {
 	Projects []*projects.Model
 	Form     *form.Form
 	Error    error
+	FlashMsg string
 }
 
 // make this global to both init() and main() to keep main() short
@@ -50,6 +53,7 @@ func init() {
 	recreateDB := flag.Bool("rdb", false, "drop db tables and recreate them")
 	logToFile := flag.Bool("ltf", true, "toggle whether to persist logs to file")
 	isDevEnv := flag.Bool("dev", true, "toggle whether app is running in developemnt mode")
+	secret := flag.String("secret", "Iamthestonethatthebuilderrefused", "32-byte string used to sign sessions")
 	flag.Parse()
 
 	// instantiate loggers
@@ -107,6 +111,13 @@ func init() {
 	staticDir := "./views/static"
 	staticResServer := http.FileServer(http.Dir(staticDir))
 
+	// instantiate session
+	session := sessions.New([]byte(*secret))
+	session.Lifetime = 30 * time.Minute
+	session.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
+		panic(err)
+	}
+
 	// Avengers, Assemble! <assemble all the things>
 	app = &application{
 		port:            port,
@@ -118,6 +129,7 @@ func init() {
 		templateData:    templateData{Form: initialForm},
 		templates:       templateCache,
 		isDevEnv:        *isDevEnv,
+		session:         session,
 	}
 
 	logservice.InfoLogger.Println("app init::success")
@@ -125,18 +137,20 @@ func init() {
 
 // main runs an instance of the app
 func main() {
+	// route all the things
+	secureRouter := app.mux.PathPrefix("").Subrouter() // needs auth
+	secureRouter.Use(app.session.Enable)
+
 	app.mux.HandleFunc("/auth", app.landingPage)
-	app.mux.HandleFunc("/", app.listProjects)
-	app.mux.HandleFunc("/projects/create", app.showCreateProjectForm).Methods("GET")
-	app.mux.HandleFunc("/projects/create", app.createproject).Methods("POST")
-	app.mux.HandleFunc("/projects/slug/{projectSlug}", app.viewProject)
-	app.mux.HandleFunc("/settings", app.settings)
-
+	secureRouter.HandleFunc("/", app.listProjects)
+	secureRouter.HandleFunc("/projects/create", app.showCreateProjectForm).Methods(http.MethodGet)
+	secureRouter.HandleFunc("/projects/create", app.createproject).Methods(http.MethodPost)
+	secureRouter.HandleFunc("/projects/slug/{projectSlug}", app.viewProject)
+	secureRouter.HandleFunc("/settings", app.settings)
 	app.mux.NotFoundHandler = http.HandlerFunc(app.notFoundErr)
-
 	app.mux.PathPrefix("/static/").Handler(http.StripPrefix("/static", app.staticResServer))
+	standardMiddleware := alice.New(app.panicRecovery, app.requestLogger, app.secureHeaders)
 
-	standardMiddleware := alice.New(app.panicRecovery, app.requestLogger, app.auth, app.secureHeaders)
 	srv := &http.Server{
 		Addr:     *app.port,
 		ErrorLog: app.errLogger,
@@ -145,5 +159,5 @@ func main() {
 
 	app.infoLogger.Printf("app start::start server [127.0.0.1%v]::success", *app.port)
 	app.infoLogger.Println("app start::ready for requests::success")
-	app.errLogger.Fatal("app start::fail", srv.ListenAndServe())
+	app.errLogger.Fatal("app start::fail", srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem"))
 }

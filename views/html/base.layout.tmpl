@@ -23,8 +23,13 @@
         {{template "body" .}}
       </div>
 
-
-      {{template "footer" .}}
+    {{with .FlashMsg}}
+    <div class="flash-msg">
+      <p class="message">{{.}}</p>
+      <button onClick="javascript:history.go(0)" id="close-btn">Close</button>
+    </div>
+    {{end}}
+    {{template "footer" .}}
     </section>
     <script src="/static/js/main.js"></script>
   </body>

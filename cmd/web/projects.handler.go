@@ -13,25 +13,27 @@ import (
 func (a *application) listProjects(w http.ResponseWriter, r *http.Request) {
 	projects, err := a.projects.SelectAll()
 	if err != nil {
-		panic(err)
+		a.serverError(w, r, err)
+		return
 	}
 
 	a.infoLogger.Printf("app run::response::%v", http.StatusOK)
-	a.renderTemplate("projects.page.tmpl", w, templateData{Projects: projects})
+	a.renderTemplate("projects.page.tmpl", w, r, templateData{Projects: projects})
 }
 
 // showCreateProjectForm handles requests at /projects/create
 func (a *application) showCreateProjectForm(w http.ResponseWriter, r *http.Request) {
 	// clear errs and form data if any
 	a.infoLogger.Printf("app run::response::%v", http.StatusOK)
-	a.renderTemplate("create.page.tmpl", w, templateData{Form: initialForm})
+	a.renderTemplate("create.page.tmpl", w, r, templateData{Form: initialForm})
 }
 
 // showCreateProjectForm handles requests at /projects/create
 func (a *application) createproject(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
-		panic(err)
+		a.serverError(w, r, err)
+		return
 	}
 
 	title := r.PostForm.Get("title")
@@ -45,7 +47,7 @@ func (a *application) createproject(w http.ResponseWriter, r *http.Request) {
 	form := a.templateData.Form.New(formValues, requiredFields)
 	if !form.IsValid() {
 		a.errLogger.Printf("app run::response::%v", http.StatusBadRequest)
-		a.renderTemplate("create.page.tmpl", w, templateData{Form: form})
+		a.renderTemplate("create.page.tmpl", w, r, templateData{Form: form})
 		return
 	}
 
@@ -69,10 +71,12 @@ func (a *application) createproject(w http.ResponseWriter, r *http.Request) {
 		}
 
 		a.errLogger.Printf("app run::response::%v", http.StatusBadRequest)
-		a.renderTemplate("create.page.tmpl", w, templateData{Form: form})
+		a.renderTemplate("create.page.tmpl", w, r, templateData{Form: form})
 		return
 	}
 
+	// if we get here, all iz vell
+	a.session.Put(r, "flashMsg", fmt.Sprintf("Project with title `%s` created successfully", title))
 	a.infoLogger.Printf("app run::response::%v", http.StatusPermanentRedirect)
 	http.Redirect(w, r, fmt.Sprintf("/projects/slug/%v", projectSlug), http.StatusSeeOther)
 }
